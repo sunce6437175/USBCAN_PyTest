@@ -7,9 +7,16 @@
 		"nReserved":"0",
 		"nCANInd":"1"
 			},
+	"onlyCAN":"3C0",
+	"listCAN":{
+		"CANa":"3C0",
+		"CANb":"5F0"
+			},
+	"SendTheNumber":"1000",
+	"TimeBetweenTransmissions":"100",
+	"setTimeRun":"2021/06/08/20:00",
+	"setTimeStop":"2021/06/08/21:00",
 	"Output_Path":"//192.168.2.22/cns3.0_sop2_ma/04.C Sample/03.非功能测试/稳定性测试/MX_AnalysisMemoryLog/output/CNS3MemoryNew.xls",
-	"TransmittingFrequency":"1024",
-	"intervalTime":"1",         
 	"mailpassCc":{
 		"lead1":"zhaotj@meixing.com",
 		"lead2":"wuj@meixing.com"

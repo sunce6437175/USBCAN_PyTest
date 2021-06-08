@@ -5,7 +5,7 @@ import time,ctypes,os,sys
 '''
 通过灯来判断状态00:58 power can1 can2    
 DLL库 基于vb.net 开发
-
+config.json 配置参数
 函数库调用流程
 openDecice 打开设备 → InitCan 初始化某一路CAN → StartCAN 启动某一路CAN → Transmit (发送CAN帧) → Close Device 关闭设备
                                                                       Receive （读取CAN帧）
@@ -71,7 +71,7 @@ class VCI_CAN_OBJ_SEND(Structure):
 
 # 接口卡设备类型定义类
 class CanBoardTypeDefines:
-    VCI_USBCAN1 = 3     # 设备类型号3
+    VCI_USBCAN1 = 3     # 设备类型号3 目只连接CAN1
     VCI_USBCAN2 = 4     # 设备类型号4
     group1 = [VCI_USBCAN1, VCI_USBCAN2]
 
