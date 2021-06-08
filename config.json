@@ -1,0 +1,17 @@
+{
+	"cantype":{
+        "can_type":"usb_can_2eu",
+        "nDeviceType1":"3",
+		"nDeviceType2":"4",
+        "nDeviceInd":"0",
+		"nReserved":"0",
+		"nCANInd":"1"
+			},
+	"Output_Path":"//192.168.2.22/cns3.0_sop2_ma/04.C Sample/03.非功能测试/稳定性测试/MX_AnalysisMemoryLog/output/CNS3MemoryNew.xls",
+	"TransmittingFrequency":"1024",
+	"intervalTime":"1",         
+	"mailpassCc":{
+		"lead1":"zhaotj@meixing.com",
+		"lead2":"wuj@meixing.com"
+	}
+}
