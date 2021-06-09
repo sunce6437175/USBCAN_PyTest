@@ -1,5 +1,5 @@
 from ctypes import *
-import time,ctypes,os,sys
+import time,ctypes,os,sys,json
 
 
 '''
@@ -15,14 +15,74 @@ openDecice 打开设备 → InitCan 初始化某一路CAN → StartCAN 启动某
 # nDeviceInd = 0  # 索引号0，代表设备个数
 # nReserved = 0  # 无意义参数
 # # nCANInd = 1  # can通道号
-class keydll:
 
+# josn 配置类
+class Configuraion():
+    class Supported ():
+        Type_USB_CAN_2EU = "usb_can_2eu"
+        Type_USB_CAN_II = "usb_can_ii"
+
+        Channel_CH0 = 0
+        Channel_CH1 = 1
+        Channel_CH2 = 2
+        Channel_CH3 = 3
+        Channel_CH4 = 4
+        Channel_CH5 = 5
+        Channel_CH6 = 6
+
+        Baudrate_100k = 100
+        Baudrate_250k = 250
+        Baudrate_500k = 500
+        Baudrate_1000k = 1000
+
+        Index_0 = 0
+        Index_1 = 1
+    def __init__(self):
+        pass
+
+    def __init__(self):
+        self.can_type = "USBCAN-2E-U"
+        self.chn = 0   # can卡通道
+        self.can_idx = 0 # CAN 卡 index
+        self.baud_rate=500 # 波特率
+
+    def setCan(self,can_type =Supported.Type_USB_CAN_2EU,  \
+               chn = Supported.Channel_CH0,can_idx = Supported.Index_0, baud_rate = Supported.Baudrate_500k):
+        self.can_type = can_type
+        self.chn = chn
+        self.can_idx = can_idx
+        self.baud_rate = baud_rate
+    def saveConfig(self):
+        file_name = "config.json"
+        try:
+            with open(file_name,"w") as f:
+                json.dump(self.__dict__,f)
+        except Exception as e:
+            print(e)
+            pass
+    def readConfig(self):
+        file_name = "config.json"
+        with open(file_name,"r") as f:
+            self.__dict__=json.load(f)
+
+
+
+
+
+# dll库类
+class keydll:
     dllName = "ECANVCI库文件64位/ECanVci64.dll"
     # 配置项地址获取(获取当前文件的绝对路径)
     dllPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),dllName).replace("\\",'/')
 
 # 调用dll文件
 dll = windll.LoadLibrary(keydll.configJsonPath)  
+
+
+
+
+
+
 
 # 1.3.5 INIT_CONFIG定义一个python的'结构体'，使用ctypes继承Structure，内容是初始化需要的参数，依据产品手册
 class VCI_INIT_CONFIG(Structure):
@@ -200,5 +260,9 @@ print("startcan0:", ret)
 
 
 if __name__ == "__main__":
+    config = Configuration()
+    config.readConfig()
+
     pass
+
 
