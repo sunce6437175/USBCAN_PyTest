@@ -1,22 +1,36 @@
 {
 	"cantype":{
+		"USBCAN设备类型":"",
         "can_type":"usb_can_2eu",
+		"设备类型号3连接CAN1":"",
         "nDeviceType1":"3",
+		"设备类型号4连接CAN2":"",
 		"nDeviceType2":"4",
+		"索引号默认0代表设备个数":"",
         "nDeviceInd":"0",
+		"暂无意义参数":"",
 		"nReserved":"0",
+		"暂无意义参数?":"",
 		"nCANInd":"1"
 			},
+	"单一can指令帧ID类型":"",
 	"onlyCAN":"3C0",
+	"混合can指令帧ID类型":"",
 	"listCAN":{
 		"CANa":"3C0",
 		"CANb":"5F0"
 			},
+	"发送次数(分为单一或混合模式)":"",
 	"SendTheNumber":"1000",
+	"发送间隔时间-单位(ms)":"",
 	"TimeBetweenTransmissions":"100",
+	"指定时间段运行":"",
 	"setTimeRun":"2021/06/08/20:00",
+	"指定时间段停止":"",
 	"setTimeStop":"2021/06/08/21:00",
+	"Output_Path 收集通道接收数据文档":"",
 	"Output_Path":"//192.168.2.22/cns3.0_sop2_ma/04.C Sample/03.非功能测试/稳定性测试/MX_AnalysisMemoryLog/output/CNS3MemoryNew.xls",
+	"测试结果自动邮件反馈list":"",
 	"mailpassCc":{
 		"lead1":"zhaotj@meixing.com",
 		"lead2":"wuj@meixing.com"
