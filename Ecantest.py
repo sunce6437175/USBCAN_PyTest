@@ -62,9 +62,15 @@ class Configuraion():
             pass
     def readConfig(self):
         file_name = "config.json"
-        with open(file_name,"r") as f:
+        with open(file_name,"r",encoding='utf-8') as f:
             self.__dict__=json.load(f)
-
+            self.nDeviceType1 = self.__dict__['cantype']['nDeviceType1']
+            print(self.nDeviceType1)
+            self.nDeviceInd = self.__dict__['cantype']['nDeviceInd']
+            print(self.nDeviceInd)
+            self.nReserved = self.__dict__['cantype']['nReserved']
+            print(self.nReserved)
+        return self.nDeviceType1,self.nDeviceInd,self.nReserved 
 
 
 
@@ -76,7 +82,7 @@ class keydll:
     dllPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),dllName).replace("\\",'/')
 
 # 调用dll文件
-dll = windll.LoadLibrary(keydll.configJsonPath)  
+dll = windll.LoadLibrary(keydll.dllPath)  
 
 
 
@@ -162,16 +168,16 @@ class CanBoardTypeDefines:
 
 
 # DLL通讯
-class Communication():
-    baud_rate_define = CanBaudrateDefines()
-    initconfig = VCI_INIT_CONFIG(0x00000000,0xffffffff, 0, 1, 0x00, 0x14, 0)#
-    vic.AccCode = 0x00000000     # 验收码，SJA1000的帧率验收码 全部是0即可 0x00000000
-    vic.AccMask = 0xffffffff     # 屏蔽码，SJA1000的帧过滤屏蔽码  推荐设置未 0Xffff ffff即为全部接受
-    vic.reserved = 0             # 保留
-    vic.Filter = 0               # 滤波使能。0=不使能，1=使能使能时，/请参照SJA1000验收滤波器设置验收码和屏蔽码。
-    vic.Timing0 = 0x00           # 500Kbps 波特率定时器0
-    vic.Timing1 = 0x1C           # 500Kbps 波特率定时器0
-    vic.Mode = 0                 # 模式。=0为正常模式，=1为只听模式， =2为自发自收模式
+# class Communication():
+#     baud_rate_define = CanBaudrateDefines()
+#     initconfig = VCI_INIT_CONFIG(0x00000000,0xffffffff, 0, 1, 0x00, 0x14, 0)#
+#     vic.AccCode = 0x00000000     # 验收码，SJA1000的帧率验收码 全部是0即可 0x00000000
+#     vic.AccMask = 0xffffffff     # 屏蔽码，SJA1000的帧过滤屏蔽码  推荐设置未 0Xffff ffff即为全部接受
+#     vic.reserved = 0             # 保留
+#     vic.Filter = 0               # 滤波使能。0=不使能，1=使能使能时，/请参照SJA1000验收滤波器设置验收码和屏蔽码。
+#     vic.Timing0 = 0x00           # 500Kbps 波特率定时器0
+#     vic.Timing1 = 0x1C           # 500Kbps 波特率定时器0
+#     vic.Mode = 0                 # 模式。=0为正常模式，=1为只听模式， =2为自发自收模式
 
 
 
@@ -180,14 +186,14 @@ class Communication():
 
 
 # 定义一个用于初始化的实例对象vic
-# vic = VCI_INIT_CONFIG()
-# vic.AccCode = 0x00000000     # 验收码，SJA1000的帧率验收码 全部是0即可 0x00000000
-# vic.AccMask = 0xffffffff     # 屏蔽码，SJA1000的帧过滤屏蔽码  推荐设置未 0Xffff ffff即为全部接受
-# vic.reserved = 0
-# vic.Filter = 0
-# vic.Timing0 = 0x00  # 500Kbps 波特率定时器0
-# vic.Timing1 = 0x1C  # 500Kbps 波特率定时器0
-# vic.Mode = 0        # 模式。=0为正常模式，=1为只听模式， =2为自发自收模式
+vic = VCI_INIT_CONFIG()
+vic.AccCode = 0x00000000     # 验收码，SJA1000的帧率验收码 全部是0即可 0x00000000
+vic.AccMask = 0xffffffff     # 屏蔽码，SJA1000的帧过滤屏蔽码  推荐设置未 0Xffff ffff即为全部接受
+vic.reserved = 0
+vic.Filter = 0
+vic.Timing0 = 0x00  # 500Kbps 波特率定时器0
+vic.Timing1 = 0x1C  # 500Kbps 波特率定时器0
+vic.Mode = 0        # 模式。=0为正常模式，=1为只听模式， =2为自发自收模式
 
 
 
@@ -231,18 +237,18 @@ vco2.Data = (0, 0, 0, 0, 0, 0, 0, 0)
 '''设备的打开如果是双通道的设备的话，可以再用initcan函数初始化'''
 # 步骤一 打开设备
 # OpenDevice(设备类型号，设备索引号，参数无意义)
-ret = dll.OpenDevice(nDeviceType, nDeviceInd, nReserved)
-print("opendevice:", ret)
+# ret = dll.OpenDevice(nDeviceType, nDeviceInd, nReserved)
+# print("opendevice:", ret)
 
 # 步骤二 执行参数初始化
 # InitCAN(设备类型号，设备索引号，第几路CAN，初始化参数initConfig)，
-ret = dll.InitCAN(nDeviceType, nDeviceInd, 0, byref(vic))
-print("initcan0:", ret)
+# ret = dll.InitCAN(nDeviceType, nDeviceInd, 0, byref(vic))
+# print("initcan0:", ret)
 
 # 步骤三 打开对应CAN通道
 # StartCAN(设备类型号，设备索引号，第几路CAN)
-ret = dll.StartCAN(nDeviceType, nDeviceInd, 0)
-print("startcan0:", ret)
+# ret = dll.StartCAN(nDeviceType, nDeviceInd, 0)
+# print("startcan0:", ret)
 
 
 # i = 1
@@ -260,9 +266,17 @@ print("startcan0:", ret)
 
 
 if __name__ == "__main__":
-    config = Configuration()
-    config.readConfig()
+    config = Configuraion()
+    nDeviceType1,nDeviceInd,nReserved = config.readConfig()
+    print('-----------------------------')
+    print(nDeviceType1)
+    print(nDeviceInd)
+    print(nReserved)
+    ret1 = dll.OpenDevice(nDeviceType1, nDeviceInd, nReserved)
+    print("opendevice:", ret1)
 
-    pass
+    ret2 = dll.InitCAN(nDeviceType1, nDeviceInd, 0, byref(vic))
+    print("initcan0:", ret2)
 
-
+    ret3 = dll.StartCAN(nDeviceType1, nDeviceInd, 0)
+    print("startcan0:", ret3)
