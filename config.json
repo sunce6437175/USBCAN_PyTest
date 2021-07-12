@@ -2,9 +2,9 @@
 	"cantype":{
 		"USBCAN设备类型":"",
         "can_type":"usb_can_2eu",
-		"设备类型号3连接CAN1":"",
+		"接口卡的类型USBCAN-I-3":"",
         "nDeviceType1":"3",
-		"设备类型号4连接CAN2":"",
+		"接口卡的类型USBCAN-II-4":"",
 		"nDeviceType2":"4",
 		"索引号默认0代表设备个数":"",
         "nDeviceInd":"0",
@@ -49,5 +49,41 @@
 	"mailpassCc":{
 		"lead1":"zhaotj@meixing.com",
 		"lead2":"wuj@meixing.com"
+	},
+	"错误码定义":"",
+	"ERR_CAN_List":{
+		"CAN控制器内部FIFO溢出":"",
+		"ERR_CAN_OVERFLOW":"0x00000001",
+		"CAN控制器错误报警":"",
+		"ERR_CAN_ERRALARM":"0x00000002",
+		"CAN控制器消极错误":"",
+		"ERR_CAN_PASSIVE":"0x00000004",
+		"CAN控制器仲裁丢失":"",
+		"ERR_CAN_LOSE":"0x00000008",
+		"CAN控制器总线错误":"",
+		"ERR_CAN_BUSERR":"0x00000010",
+		"CAN接收寄存器满":"",
+		"ERR_CAN_REG_FULL":"0x00000020",
+		"CAN接收寄存器溢出":"",
+		"ERR_CAN_REC_OVER":"0x00000040 CAN接收寄存器溢出",
+		"CAN控制器主动错误":"",
+		"ERR_CAN_ACTIVE":"0x00000080",
+		"设备已经打开":"",
+		"ERR_DEVICEOPENED":"0x00000100",
+		"打开设备错误":"",
+		"ERR_DEVICEOPEN":"0x00000200",
+		"设备没有打开":"",
+		"ERR_DEVICENOTOPEN":"0x00000400",
+		"缓冲区溢出":"",
+		"ERR_BUFFEROVERFLOW":"0x00000800",
+		"此设备不存在":"",
+		"ERR_DEVICENOTEXIST":"0x00001000",
+		"装载动态库失败":"",
+		"ERR_LOADKERNELDLL":"0x00002000",
+		"执行命令失败错误码":"",
+		"ERR_CMDFAILED":"0x00004000",
+		"内存不足":"",
+		"ERR_BUFFERCREATE":"0x00008000"
 	}
+
 }
