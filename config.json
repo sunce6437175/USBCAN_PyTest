@@ -42,7 +42,7 @@
 	"Can信号模拟设备list":{
 		"车辆点火":""
 
-	}
+	},
 	"Output_Path 收集通道接收数据文档":"",
 	"Output_Path":"//192.168.2.22/cns3.0_sop2_ma/04.C Sample/03.非功能测试/稳定性测试/MX_AnalysisMemoryLog/output/CNS3MemoryNew.xls",
 	"测试结果自动邮件反馈list":"",
