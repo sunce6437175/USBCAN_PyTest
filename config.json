@@ -65,7 +65,7 @@
 		"CAN接收寄存器满":"",
 		"ERR_CAN_REG_FULL":"0x00000020",
 		"CAN接收寄存器溢出":"",
-		"ERR_CAN_REC_OVER":"0x00000040 CAN接收寄存器溢出",
+		"ERR_CAN_REC_OVER":"0x00000040",
 		"CAN控制器主动错误":"",
 		"ERR_CAN_ACTIVE":"0x00000080",
 		"设备已经打开":"",
