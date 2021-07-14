@@ -24,9 +24,8 @@ class keydll:
 # 调用dll文件
 dll = ctypes.windll.LoadLibrary(keydll.dllPath)  
 
-
 # 1.3.5 INIT_CONFIG定义一个python的'结构体'，使用ctypes继承Structure，内容是初始化需要的参数，依据产品手册
-class VCI_INIT_CONFIG(Structure):
+class INIT_CONFIG(Structure):
     _fields_ = [("AccCode", c_ulong),  # 验收码，后面是数据类型
                 ("AccMask", c_ulong),  # 屏蔽码
                 ("Reserved", c_ulong),  # 保留
@@ -37,9 +36,8 @@ class VCI_INIT_CONFIG(Structure):
                 ("Mode", c_ubyte)    # 模式。=0为正常模式，=1为只听模式， =2为自发自收模式
                 ]  
 
-
-# 定义发送报文的结构体 CAN_OBJ 结构体表示帧的数据结构。在发送函数Transmit和接收函数Receive中被用来传送CAN信息帧。
-class VCI_CAN_OBJ(Structure):
+# 1.3.2 定义发送报文的结构体 CAN_OBJ 结构体表示帧的数据结构。在发送函数Transmit和接收函数Receive中被用来传送CAN信息帧。
+class CAN_OBJ(Structure):
     _fields_ = [("ID", c_uint),  # 报文帧ID'''
                 ("TimeStamp", c_uint),  # 接收到信息帧时的时间标识
                 ("TimeFlag", c_ubyte),  # 是否使用时间标识， 为1时TimeStamp有效
@@ -58,8 +56,9 @@ class VCI_CAN_OBJ(Structure):
                 ("Data", c_ubyte * 8),  # CAN报文的数据。 空间受DataLen的约束。
                 ("Reserved", c_ubyte * 3)      # 系统保留
                 ] 
-# 定义发送报文的结构体 CAN_OBJ_SEND
-class VCI_CAN_OBJ_SEND(Structure):
+
+# 基于1.3.2 父类自创子类 定义发送报文的结构体 CAN_OBJ_SEND
+class CAN_OBJ_SEND(Structure):
     _fields_ = [("ID", c_uint),
                 ("TimeStamp", c_uint),
                 ("TimeFlag", c_byte),
@@ -72,69 +71,71 @@ class VCI_CAN_OBJ_SEND(Structure):
                 ]
 
 
-
-# josn 配置类
+# config.josn 配置类
 class Configuraion():
-    class Supported ():
-        Type_USB_CAN_2EU = "usb_can_2eu"
-        Type_USB_CAN_II = "usb_can_ii"
+    # class Supported ():
+        # Type_USB_CAN_2EU = "usb_can_2eu"
+        # Type_USB_CAN_II = "usb_can_ii"
 
-        Channel_CH0 = 0
-        Channel_CH1 = 1
-        Channel_CH2 = 2
-        Channel_CH3 = 3
-        Channel_CH4 = 4
-        Channel_CH5 = 5
-        Channel_CH6 = 6
+        # Channel_CH0 = 0
+        # Channel_CH1 = 1
+        # Channel_CH2 = 2
+        # Channel_CH3 = 3
+        # Channel_CH4 = 4
+        # Channel_CH5 = 5
+        # Channel_CH6 = 6
 
-        Baudrate_100k = 100
-        Baudrate_250k = 250
-        Baudrate_500k = 500
-        Baudrate_1000k = 1000
+        # Baudrate_100k = 100
+        # Baudrate_250k = 250
+        # Baudrate_500k = 500
+        # Baudrate_1000k = 1000
 
-        Index_0 = 0
-        Index_1 = 1
+        # Index_0 = 0
+        # Index_1 = 1
 
-    def __init__(self):
-        self.can_type = "USBCAN-2E-U"
-        self.chn = 0   # can卡通道
-        self.can_idx = 0 # CAN 卡 index
-        self.baud_rate=500 # 波特率
+    # def __init__(self):
+        # self.can_type = "USBCAN-2E-U"
+        # self.chn = 0   # can卡通道
+        # self.can_idx = 0 # CAN 卡 index
+        # self.baud_rate=500 # 波特率
 
-    def setCan(self,can_type =Supported.Type_USB_CAN_2EU,  \
-               chn = Supported.Channel_CH0,can_idx = Supported.Index_0, baud_rate = Supported.Baudrate_500k):
-        self.can_type = can_type
-        self.chn = chn
-        self.can_idx = can_idx
-        self.baud_rate = baud_rate
-    def saveConfig(self):
-        file_name = "config.json"
-        try:
-            with open(file_name,"w") as f:
-                json.dump(self.__dict__,f)
-        except Exception as e:
-            print(e)
-            pass
-    # 读取config.json文件
-    def readConfig(self):
+    # def setCan(self,can_type =Supported.Type_USB_CAN_2EU,  \
+        #        chn = Supported.Channel_CH0,can_idx = Supported.Index_0, baud_rate = Supported.Baudrate_500k):
+        # self.can_type = can_type
+        # self.chn = chn
+        # self.can_idx = can_idx
+        # self.baud_rate = baud_rate
+    # def saveConfig(self):
+        # file_name = "config.json"
+        # try:
+        #     with open(file_name,"w") as f:
+        #         json.dump(self.__dict__,f)
+        # except Exception as e:
+        #     print(e)
+        #     pass
+    
+    # 读取config.json文件中的cantyoe
+    def readConfig_cantype(self):
         file_name = "config.json"
         with open(file_name,"r",encoding='utf-8') as f:
             self.__dict__=json.load(f)
-            self.nDeviceType1 = self.__dict__['cantype']['nDeviceType1']
-            print(self.nDeviceType1)
-            self.nDeviceInd = self.__dict__['cantype']['nDeviceInd']
-            print(self.nDeviceInd)
-            self.nReserved = self.__dict__['cantype']['nReserved']
-            print(self.nReserved)
-            self.baud_rate = self.__dict__['cantype']['baud_rate']
-            print(self.baud_rate)
-        return self.nDeviceType1,self.nDeviceInd,self.nReserved,self.baud_rate
 
-        # 接口卡设备类型定义类
+            self.nDeviceType1 = self.__dict__['cantype']['nDeviceType1']
+            self.AccCode = self.__dict__['cantype']['AccCode']
+            self.AccMask = self.__dict__['cantype']['AccMask']
+            self.nReserved = self.__dict__['cantype']['nReserved']
+            self.Fitter = self.__dict__['cantype']['Filter']
+            self.nDeviceInd = self.__dict__['cantype']['nDeviceInd']
+            self.baud_rate = self.__dict__['cantype']['baud_rate']
+            self.Mode = self.__dict__['cantype']['Mode']
+            # print(self.baud_rate)
+        return self.nDeviceType1,self.AccCode,self.AccMask,self.nReserved,self.Fitter,self.nDeviceInd,self.baud_rate,self.Mode
+
+    # 接口卡设备类型定义类
     # class CanBoardTypeDefines:
-    #     VCI_USBCAN1 = 3     # 设备类型号3 目只连接CAN1
-    #     VCI_USBCAN2 = 4     # 设备类型号4
-    #     group1 = [VCI_USBCAN1, VCI_USBCAN2]
+        VCI_USBCAN1 = 3     # 设备类型号3 目只连接CAN1
+        VCI_USBCAN2 = 4     # 设备类型号4
+        group1 = [VCI_USBCAN1, VCI_USBCAN2]
 
     # 波特率可以定义类
     class CanBoardTypeDefines:
@@ -160,21 +161,65 @@ class Configuraion():
                     raise Exception("group1 CAN卡所设置的波特率暂不被支持 波特率为"+ str(baud_rate))
             except Exception as e:
                 raise e
-    # 
+    # 定义一个用于初始化的实例对象vic
     def InitVic(self):
-        self.vic = VCI_INIT_CONFIG()
-        self.vic.AccCode = 0x00000000
-        self.vic.AccMask = 0xffffffff
-        self.vic.reserved = 0
-        self.vic.Filter = 0
-        
-        config = Configuraion()
-        nDeviceType1,nDeviceInd,nReserved,baud_rate = config.readConfig()
-        baud_rateS = Configuraion.CanBoardTypeDefines()
-        self.vic.Timing0,self.vic.Timing1 = baud_rateS.group1_baud_rate3(int(baud_rate))
+        self.vic = INIT_CONFIG()
 
-        self.vic.Mode = 0
+        config = Configuraion()
+        nDeviceType1,self.AccCode,self.AccMask,self.nReserved,self.Fitter,nDeviceInd,self.baud_rate,self.Mode = config.readConfig_cantype()
+
+        baud_rateS = Configuraion.CanBoardTypeDefines()
+        self.vic.Timing0,self.vic.Timing1 = baud_rateS.group1_baud_rate3(int(self.baud_rate))
+
         return self.vic
+    # 读取config.json文件中的cantyoe
+    def Normal_Transmission_Mode(self):
+        self.vco = CAN_OBJ()
+        file_name = "config.json"
+        with open(file_name,"r",encoding='utf-8') as f:
+            self.__dict__=json.load(f)
+            self.SendMode = self.__dict__['cantype']['SendMode']
+            try:
+                if int(self.SendMode) == 1:
+                    self.SendTheNumber = self.__dict__['普通发送模式']['SendTheNumber']
+                    self.TimeBetweenTransmissions = self.__dict__['普通发送模式']['TimeBetweenTransmissions']
+                    self.SetCANlist = self.__dict__['普通发送模式']['SetCANlist']
+                    print('----------------------------')
+                    print(type(self.SetCANlist))
+                    print(self.SetCANlist)
+                    print('----------------------------')
+
+                    return self.SendTheNumber,self.TimeBetweenTransmissions,self.SetCANlist
+                elif int(self.SendMode) == 2:
+                    pass
+                    # return timing0,timing1
+                elif int(self.SendMode) == 4:
+                    pass
+                    # return timing0,timing1
+                else:
+                    raise Exception("发送模式为"+ str(self.SendMode))
+
+            except Exception as e:
+                raise e
+
+
+
+# i = 1
+# while i:
+#     art = dll.Transmit(nDeviceType, nDeviceInd, 0, byref(vco), 1)  # 发送vco
+#     ret = dll.Receive(nDeviceType, nDeviceInd, 0, byref(vco2), 1, 0)  # 以vco2的形式接收报文
+#     time.sleep(1)  # 设置一个循环发送的时间
+#     if ret > 0:
+#         print(i)
+#         print(list(vco2.Data))  # 打印接收到的报文
+#     i += 1
+
+# ret = dll.CloseDevice(nDeviceType, nDeviceInd)
+# print("closedevice:", ret)
+
+'''设备的打开如果是双通道的设备的话，可以再用initcan函数初始化'''
+    # def Normal_Transmission_Mode(self):
+    #     self.vco = CAN_OBJ()
 
 
 
@@ -193,8 +238,6 @@ class Configuraion():
 #     vic.Mode = 0                 # 模式。=0为正常模式，=1为只听模式， =2为自发自收模式
 
 
-
-
 # 定义一个用于初始化的实例对象vic
 # vic = VCI_INIT_CONFIG()
 # vic.AccCode = 0x00000000     # 验收码，SJA1000的帧率验收码 全部是0即可 0x00000000
@@ -204,7 +247,6 @@ class Configuraion():
 # vic.Timing0 = 0x00  # 500Kbps 波特率定时器0
 # vic.Timing1 = 0x1C  # 500Kbps 波特率定时器0
 # vic.Mode = 0        # 模式。=0为正常模式，=1为只听模式， =2为自发自收模式
-
 
 
 # 定义报文实例对象，用于发送
@@ -278,15 +320,21 @@ if __name__ == "__main__":
 
 
     config = Configuraion()
-    nDeviceType1,nDeviceInd,nReserved,baud_rate = config.readConfig()
-
-
-    ret1 = dll.OpenDevice(int(nDeviceType1), int(nDeviceInd), int(nReserved))
-    print("opendevice:", ret1)
-
+    nDeviceType1,AccCode,AccMask,Reserved,Fitter,DeviceInd,baud_rate,Mode = config.readConfig_cantype()
+    # 步骤一 打开设备
+    # OpenDevice(设备类型号，设备索引号，参数无意义)
+    print("下面执行操作返回“1”表示操作成功！")
+    ret1 = dll.OpenDevice(int(nDeviceType1), int(DeviceInd), int(Reserved))
+    print("打开设备状态码:", ret1)
+    # 步骤二 执行参数初始化
+    # InitCAN(设备类型号，设备索引号，第几路CAN，初始化参数initConfig)，
     vic = config.InitVic()
-    ret2 = dll.InitCAN(int(nDeviceType1),int(nDeviceInd), 0, byref(vic))
-    print("initcan0:", ret2)
+    ret2 = dll.InitCAN(int(nDeviceType1),int(DeviceInd), 0, byref(vic))
 
-    ret3 = dll.StartCAN(int(nDeviceType1), int(nDeviceInd), 0)
-    print("startcan0:", ret3)
+    print("初始化状态码:", ret2)
+    # 步骤三 打开对应CAN通道
+    # StartCAN(设备类型号，设备索引号，第几路CAN)
+    ret3 = dll.StartCAN(int(nDeviceType1), int(DeviceInd), 0)
+    print("启动状态码:", ret3)
+
+    config.Normal_Transmission_Mode()
