@@ -63,7 +63,7 @@
 	"Can信号模拟设备list":{
 		"车辆点火":"C0 00 43 00",
 		"KL15 ON and KLS ON":{
-			"ID":"0x000003C0",
+			"ID":"30783030303030334330",
 			"SendType":"0",
 			"RemoteFlag":"0",
 			"ExternFlag":"0",

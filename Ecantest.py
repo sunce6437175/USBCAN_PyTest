@@ -1,6 +1,7 @@
+import binascii
 from ctypes import *
 import time,ctypes,os,sys,json
-
+from binascii import a2b_hex
 
 '''
 通过灯来判断状态00:58 power can1 can2    
@@ -221,9 +222,13 @@ class Configuraion():
 
                     if set(tmp) < set((self.__dict__['Can信号模拟设备list']).keys()):
                         numlist = len(tmp)
-
+                        
                         for vcoi in tmp:
                             vcokey = self.__dict__["Can信号模拟设备list"][vcoi]
+                            # print(type(bytes(vcokey['ID'], encoding = "utf8")))
+                            # print(bytes(vcokey['ID'], encoding = "utf8"))
+                            str16 = binascii.b2a_hex(vcokey['ID'].encode('utf-8'))
+                            print(str16)
                             vcox = VcoV(vcokey['ID'],vcokey['SendType'],vcokey['RemoteFlag'],vcokey['ExternFlag'], \
                                vcokey['DataLen'],vcokey['Data'],vcokey['Reserved'],vcokey['executivemode'])
                             x = vcox.Vco_CAN_OBJ()
