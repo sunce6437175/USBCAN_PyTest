@@ -70,7 +70,31 @@ class CAN_OBJ_SEND(Structure):
                 ("Reserved", c_ubyte*3)
                 ]
 
+class VcoV():
+    def __init__(self,ID,SendType,RemoteFlag,ExternFlag,DataLen,Data,Reserved,executivemode):
+        self.ID = ID
+        self.SendType = SendType
+        self.RemoteFlag = RemoteFlag
+        self.ExternFlag = ExternFlag
+        self.DataLen = DataLen
+        self.Data = Data
+        self.Reserved = Reserved
+        self.executivemode = executivemode
+        # print(type(self.ID))
+        # print(type(self.SendType)
 
+    def Vco_CAN_OBJ(self):
+        self.vco = CAN_OBJ()
+        self.vco.ID = self.ID
+        self.vco.SendType = int(self.SendType)
+        self.vco.RemoteFlag = int(self.RemoteFlag)
+        self.vco.ExternFlag = int(self.ExternFlag)
+        self.vco.DataLen = int(self.DataLen)
+        self.vco.Data = int(self.Data)
+        self.vco.Reserved = int(self.Reserved)
+        
+        print(self.vco)
+        return self.vco
 # config.josn 配置类
 class Configuraion():
     # class Supported ():
@@ -172,35 +196,60 @@ class Configuraion():
         self.vic.Timing0,self.vic.Timing1 = baud_rateS.group1_baud_rate3(int(self.baud_rate))
 
         return self.vic
-    # 读取config.json文件中的cantyoe
-    def Normal_Transmission_Mode(self):
-        self.vco = CAN_OBJ()
+
+
+
+
+
+    # 读取config.json文件中的实现单次发送
+    def Normal_one_Transmission_Mode(self):
+        
         file_name = "config.json"
         with open(file_name,"r",encoding='utf-8') as f:
             self.__dict__=json.load(f)
+            # 单次模式判断sendMode =1 
             self.SendMode = self.__dict__['cantype']['SendMode']
             try:
                 if int(self.SendMode) == 1:
-                    self.SendTheNumber = self.__dict__['普通发送模式']['SendTheNumber']
-                    self.TimeBetweenTransmissions = self.__dict__['普通发送模式']['TimeBetweenTransmissions']
-                    self.SetCANlist = self.__dict__['普通发送模式']['SetCANlist']
-                    print('----------------------------')
-                    print(type(self.SetCANlist))
-                    print(self.SetCANlist)
-                    print('----------------------------')
+                    # # 发送帧类型，1为单次发送
+                    self.SendType= self.__dict__['1普通单次发送模式']['SendType']
+                    self.SetCANlist = self.__dict__['1普通单次发送模式']['SetCANlist']
 
-                    return self.SendTheNumber,self.TimeBetweenTransmissions,self.SetCANlist
+                    self.vco = CAN_OBJ()
+                    self.vco.SendType = int(self.SendType)
+                    tmp = self.SetCANlist.values()
+
+                    if set(tmp) < set((self.__dict__['Can信号模拟设备list']).keys()):
+                        numlist = len(tmp)
+
+                        for vcoi in tmp:
+                            vcokey = self.__dict__["Can信号模拟设备list"][vcoi]
+                            vcox = VcoV(vcokey['ID'],vcokey['SendType'],vcokey['RemoteFlag'],vcokey['ExternFlag'], \
+                               vcokey['DataLen'],vcokey['Data'],vcokey['Reserved'],vcokey['executivemode'])
+                            x = vcox.Vco_CAN_OBJ()
+
+
+
+                    else:
+                        print("SetCANlist中的can信号不在Can信号模拟设备list当中！")
+
+                    return self.SendType,self.SetCANlist
+
+
+
+
                 elif int(self.SendMode) == 2:
-                    pass
+                    print("ERROR =2普通循环模式")
                     # return timing0,timing1
-                elif int(self.SendMode) == 4:
-                    pass
+                elif int(self.SendMode) == 3:
+                    print("ERROR =3指定时间发送模式")
                     # return timing0,timing1
                 else:
                     raise Exception("发送模式为"+ str(self.SendMode))
 
             except Exception as e:
                 raise e
+
 
 
 
@@ -337,4 +386,4 @@ if __name__ == "__main__":
     ret3 = dll.StartCAN(int(nDeviceType1), int(DeviceInd), 0)
     print("启动状态码:", ret3)
 
-    config.Normal_Transmission_Mode()
+    config.Normal_one_Transmission_Mode()

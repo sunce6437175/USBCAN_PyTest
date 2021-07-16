@@ -22,7 +22,7 @@
 		"baud_rate":"500",
 		"模式":"=0为正常模式，=1为只听模式， =2为自发自收模式",
 		"Mode":"0",
-		"发送方式":"=1普通单次模式，=2普通重复模式，=3指定时间发送模式",
+		"发送方式":"=1普通单次模式，=2普通循环模式，=3指定时间发送模式,=4区间发送模式",
 		"SendMode":"1"
 			},
 	"单一can指令帧ID类型":"",
@@ -32,18 +32,29 @@
 		"CANa":"3C0",
 		"CANb":"5F0"
 			},
-	"普通发送模式":{
+	"1普通单次发送模式":{
+		"发送帧类型=1时为单次发送":"",
+		"SendType":"1",
+		"SetCANlist":{
+			"CANa":"KL15 ON and KLS ON",
+			"CANb":"Headlight Open"
+				}
+
+	},
+	"2普通循环发送模式":{
 		"发送次数":"eg:500次,1000次,无限次：LimitedTime",
 		"SendTheNumber":"1000",
 		"每次发送间隔时间-单位(ms)":"eg:50ms,100ms等",
 		"TimeBetweenTransmissions":"100",
+		"发送帧类型=0时为正常发送":"",
+		"SendType":"0",
 		"SetCANlist":{
 			"CANa":"KL15 ON and KLS ON",
-			"CANb":"大灯开"
+			"CANb":"Headlight Open"
 				}
 
 	},
-	"指定时间发送模式":{
+	"3指定时间发送模式":{
 		"指定时间段运行":"",
 		"setTimeRun":"2021/06/08/20:00",
 		"指定时间段停止":"",
@@ -92,7 +103,7 @@
 			"DataLen":"8",
 			"Data":"(253, 138, 10, 255, 255, 0, 0, 0)",
 			"Reserved":"(0, 0, 0)",
-			"executivemode":"false"
+			"executivemode":"true"
 		},
 		"大灯关":"FD 00 0A FF FF 00 00 00",
 		"Headlight Closed":{
