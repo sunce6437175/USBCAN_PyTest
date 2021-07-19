@@ -73,29 +73,45 @@ class CAN_OBJ_SEND(Structure):
 
 class VcoV():
     def __init__(self,ID,SendType,RemoteFlag,ExternFlag,DataLen,Data,Reserved,executivemode):
-        self.ID = ID
-        self.SendType = SendType
-        self.RemoteFlag = RemoteFlag
-        self.ExternFlag = ExternFlag
-        self.DataLen = DataLen
-        self.Data = Data
-        self.Reserved = Reserved
+        self.ID = int(ID,16)
+        self.SendType = int(SendType)
+        self.RemoteFlag = int(RemoteFlag)
+        self.ExternFlag = int(ExternFlag)
+        self.DataLen = int(DataLen)
+        self.Data = tuple(eval(Data))
+        self.Reserved = tuple(eval(Reserved))
         self.executivemode = executivemode
         # print(type(self.ID))
         # print(type(self.SendType)
 
-    def Vco_CAN_OBJ(self):
-        self.vco = CAN_OBJ()
-        self.vco.ID = self.ID
-        self.vco.SendType = int(self.SendType)
-        self.vco.RemoteFlag = int(self.RemoteFlag)
-        self.vco.ExternFlag = int(self.ExternFlag)
-        self.vco.DataLen = int(self.DataLen)
-        self.vco.Data = int(self.Data)
-        self.vco.Reserved = int(self.Reserved)
+    # def Vco_CAN_OBJ(self):
+    #     self.vco = CAN_OBJ()
+        # self.vco.ID = int(self.ID,16)
+        # self.vco.SendType = int(self.SendType)
+        # self.vco.RemoteFlag = int(self.RemoteFlag)
+        # self.vco.ExternFlag = int(self.ExternFlag)
+        # self.vco.DataLen = int(self.DataLen)
+        # self.vco.Data = tuple(eval(self.Data))
+        # self.vco.Reserved = tuple(eval(self.Reserved))
         
-        print(self.vco)
-        return self.vco
+        # print('vco.ID:',self.vco.ID)
+        # print('vco.SendType:',self.vco.SendType)
+        # print('vco.RemoteFlag:',self.vco.RemoteFlag)
+        # print('vco.ExternFlag:',self.vco.ExternFlag)
+        # print('vco.DataLen:',self.vco.DataLen)
+        # print('vco.Data:',self.vco.Data)
+        # print('vco.Reserved:',self.vco.Reserved)
+        # print('*******************************************')
+        # print('vco.ID:',int(self.ID,16))
+        # print('vco.SendType:',int(self.SendType))
+        # print('vco.RemoteFlag:',int(self.RemoteFlag))
+        # print('vco.ExternFlag:',int(self.ExternFlag))
+        # print('vco.DataLen:',int(self.DataLen))
+        # print('vco.Data:',tuple(eval(self.Data)))
+        # print('vco.Reserved:',tuple(eval(self.Reserved)))
+    def go_1(self):
+        return self.ID,self.SendType,self.RemoteFlag,self.ExternFlag,self.DataLen, \
+            self.Data,self.Reserved,self.executivemode
 # config.josn 配置类
 class Configuraion():
     # class Supported ():
@@ -142,7 +158,7 @@ class Configuraion():
     # 读取config.json文件中的cantyoe
     def readConfig_cantype(self):
         file_name = "config.json"
-        with open(file_name,"r",encoding='utf-8') as f:
+        with open(file_name,'r',encoding='utf-8') as f:
             self.__dict__=json.load(f)
 
             self.nDeviceType1 = self.__dict__['cantype']['nDeviceType1']
@@ -208,10 +224,12 @@ class Configuraion():
         file_name = "config.json"
         with open(file_name,"r",encoding='utf-8') as f:
             self.__dict__=json.load(f)
+            self.n1 = self.__dict__['cantype']['nDeviceType1']
+            self.nd = self.__dict__['cantype']['nDeviceInd']
             # 单次模式判断sendMode =1 
             self.SendMode = self.__dict__['cantype']['SendMode']
             try:
-                if int(self.SendMode) == 1:
+                if int(self.SendMode) == 0:
                     # # 发送帧类型，1为单次发送
                     self.SendType= self.__dict__['1普通单次发送模式']['SendType']
                     self.SetCANlist = self.__dict__['1普通单次发送模式']['SetCANlist']
@@ -227,11 +245,42 @@ class Configuraion():
                             vcokey = self.__dict__["Can信号模拟设备list"][vcoi]
                             # print(type(bytes(vcokey['ID'], encoding = "utf8")))
                             # print(bytes(vcokey['ID'], encoding = "utf8"))
-                            str16 = binascii.b2a_hex(vcokey['ID'].encode('utf-8'))
-                            print(str16)
-                            vcox = VcoV(vcokey['ID'],vcokey['SendType'],vcokey['RemoteFlag'],vcokey['ExternFlag'], \
+                            # str16 = binascii.b2a_hex(vcokey['ID'].encode('utf-8'))
+                            # print(str16)
+                            self.vco = CAN_OBJ()
+                            vcox = VcoV(vcokey['ID'], \
+                                vcokey['SendType'],vcokey['RemoteFlag'],vcokey['ExternFlag'], \
                                vcokey['DataLen'],vcokey['Data'],vcokey['Reserved'],vcokey['executivemode'])
-                            x = vcox.Vco_CAN_OBJ()
+                            # v01 = vcox.Vco_CAN_OBJ()
+                            self.vco.ID ,self.vco.SendType,self.vco.RemoteFlag,self.vco.ExternFlag,self.vco.DataLen,self.vco.Data,self.vco.Reserved,exmode = vcox.go_1()
+                            # self.vco.ID = hex(xidx)
+                            print('vco.ID:',self.vco.ID)
+                            print('vco.SendType:',self.vco.SendType)
+                            print('vco.RemoteFlag:',self.vco.RemoteFlag)
+                            print('vco.ExternFlag:',self.vco.ExternFlag)
+                            print('vco.DataLen:',self.vco.DataLen)
+                            print('vco.Data:',self.vco.Data)
+                            print('vco.Reserved:',self.vco.Reserved)
+
+                            # self.vco.ID = 0x000003C0   # 帧的ID KL15,KLS 
+                            # self.vco.SendType = 1  # 发送帧类型，0是正常发送，1为单次发送，这里要选1！要不发不去！
+                            # self.vco.RemoteFlag = 0
+                            # self.vco.ExternFlag = 0
+                            # self.vco.DataLen = 8
+                            # self.vco.Data = (192, 0, 67, 0)
+                            # self.vco.Reserved = (0, 0, 0)
+
+                            i = 1
+                            while i:
+                                art = dll.Transmit(self.n1, self.nd, 0, byref(self.vco), 1)  # 发送vco
+                                # ret = dll.Receive(nDeviceType, nDeviceInd, 0, byref(vco2), 1, 0)  # 以vco2的形式接收报文
+                                time.sleep(1)  # 设置一个循环发送的时间
+                                # if ret > 0:
+                                #     print(i)
+                                #     print(list(vco2.Data))  # 打印接收到的报文
+                                i += 1
+
+                            ret = dll.CloseDevice(self.n1,self.nd)
 
 
 
@@ -392,3 +441,14 @@ if __name__ == "__main__":
     print("启动状态码:", ret3)
 
     config.Normal_one_Transmission_Mode()
+ 
+    # file_name = "config.json"
+    # with open(file_name,'r',encoding='utf-8') as f:
+    #     s = json.load(f)
+    #     canid = s['Can信号模拟设备list']['KL15 ON and KLS ON']['ID']
+    #     print(canid)
+    #     print(type(canid))
+    # print('----------------------------')
+    # modeID = 0x000003C0
+    # print(modeID)
+    # print(type(modeID))
