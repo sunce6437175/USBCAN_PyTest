@@ -16,6 +16,9 @@ openDecice 打开设备 → InitCan 初始化某一路CAN → StartCAN 启动某
 # nReserved = 0  # 无意义参数
 # # nCANInd = 1  # can通道号
 
+class jsons:
+    jsonname = "config.json"
+    jsonPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),jsonname).replace("\\",'/')
 
 # dll库类
 class keydll:
@@ -157,8 +160,7 @@ class Configuraion():
     
     # 读取config.json文件中的cantyoe
     def readConfig_cantype(self):
-        file_name = "config.json"
-        with open(file_name,'r',encoding='utf-8') as f:
+        with open(jsons.jsonPath,'r',encoding='utf-8') as f:
             self.__dict__=json.load(f)
 
             self.nDeviceType1 = self.__dict__['cantype']['nDeviceType1']
@@ -220,9 +222,7 @@ class Configuraion():
 
     # 读取config.json文件中的实现单次发送
     def Normal_one_Transmission_Mode(self):
-        
-        file_name = "config.json"
-        with open(file_name,"r",encoding='utf-8') as f:
+        with open(jsons.jsonPath,"r",encoding='utf-8') as f:
             self.__dict__=json.load(f)
             self.n1 = self.__dict__['cantype']['nDeviceType1']
             self.nd = self.__dict__['cantype']['nDeviceInd']
@@ -252,9 +252,17 @@ class Configuraion():
                                 vcokey['SendType'],vcokey['RemoteFlag'],vcokey['ExternFlag'], \
                                vcokey['DataLen'],vcokey['Data'],vcokey['Reserved'],vcokey['executivemode'])
                             # v01 = vcox.Vco_CAN_OBJ()
-                            self.vco.ID ,self.vco.SendType,self.vco.RemoteFlag,self.vco.ExternFlag,self.vco.DataLen,self.vco.Data,self.vco.Reserved,exmode = vcox.go_1()
-                            # self.vco.ID = hex(xidx)
+                            TenID,self.vco.SendType,self.vco.RemoteFlag,self.vco.ExternFlag,self.vco.DataLen,self.vco.Data,self.vco.Reserved,exmode = vcox.go_1()
+                            a = hex(TenID)
+                            print(a)
+                            b = a[:2] + '00000' + a[2:]
+                            print(b)
+                            self.vco.ID = b
+                            print(type(self.vco.ID))
+                            print(self.vco.ID)
+                            print('--------------------------')
                             print('vco.ID:',self.vco.ID)
+                            print('--------------------------')
                             print('vco.SendType:',self.vco.SendType)
                             print('vco.RemoteFlag:',self.vco.RemoteFlag)
                             print('vco.ExternFlag:',self.vco.ExternFlag)
@@ -353,15 +361,17 @@ class Configuraion():
 
 
 # 定义报文实例对象，用于发送
-# vco = VCI_CAN_OBJ()
+vco = CAN_OBJ()
 # vco.ID = 0x00000055  # 帧的ID 默认demo
-# vco.ID = 0x000003C0   # 帧的ID KL15,KLS 
+vco.ID = 0x000003C0   # 帧的ID KL15,KLS 
 # vco.ID = 0x000005F0   # 帧的ID 大灯 
-# vco.SendType = 1  # 发送帧类型，0是正常发送，1为单次发送，这里要选1！要不发不去！
-# vco.RemoteFlag = 0
-# vco.ExternFlag = 0
-# vco.DataLen = 8
-
+vco.SendType = 1  # 发送帧类型，0是正常发送，1为单次发送，这里要选1！要不发不去！
+vco.RemoteFlag = 0
+vco.ExternFlag = 0
+vco.DataLen = 8
+print('***********************')
+print(type(vco.ID))
+print('***********************')
 # 单独传参数 十六进制 →OK
 # 传参数 十六进制  转到 十进制 →OK
 #大灯关闭信号 FD 00 0A FF FF 00 00 00	
@@ -441,14 +451,3 @@ if __name__ == "__main__":
     print("启动状态码:", ret3)
 
     config.Normal_one_Transmission_Mode()
- 
-    # file_name = "config.json"
-    # with open(file_name,'r',encoding='utf-8') as f:
-    #     s = json.load(f)
-    #     canid = s['Can信号模拟设备list']['KL15 ON and KLS ON']['ID']
-    #     print(canid)
-    #     print(type(canid))
-    # print('----------------------------')
-    # modeID = 0x000003C0
-    # print(modeID)
-    # print(type(modeID))
