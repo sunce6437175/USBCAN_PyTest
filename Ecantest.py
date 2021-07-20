@@ -253,16 +253,21 @@ class Configuraion():
                                vcokey['DataLen'],vcokey['Data'],vcokey['Reserved'],vcokey['executivemode'])
                             # v01 = vcox.Vco_CAN_OBJ()
                             TenID,self.vco.SendType,self.vco.RemoteFlag,self.vco.ExternFlag,self.vco.DataLen,self.vco.Data,self.vco.Reserved,exmode = vcox.go_1()
-                            a = hex(TenID)
-                            print(a)
-                            b = a[:2] + '00000' + a[2:]
-                            print(b)
-                            self.vco.ID = b
-                            print(type(self.vco.ID))
-                            print(self.vco.ID)
-                            print('--------------------------')
-                            print('vco.ID:',self.vco.ID)
-                            print('--------------------------')
+                            # print('**************************')
+                            # print(type(TenID))
+                            # print('**************************')
+                            # a = hex(TenID)
+                            # print(a)
+                            # b = a[:2] + '00000' + a[2:]
+                            # print(b)
+                            # self.vco.ID = eval(b)
+                            self.vco.ID = hex(TenID)
+
+                            # print(type(self.vco.ID))
+                            # print(int(self.vco.ID))
+                            # print('--------------------------')
+                            # print('vco.ID:',self.vco.ID)
+                            # print('--------------------------')
                             print('vco.SendType:',self.vco.SendType)
                             print('vco.RemoteFlag:',self.vco.RemoteFlag)
                             print('vco.ExternFlag:',self.vco.ExternFlag)
@@ -289,6 +294,8 @@ class Configuraion():
                                 i += 1
 
                             ret = dll.CloseDevice(self.n1,self.nd)
+                                # ret = dll.CloseDevice(int(nDeviceType1), int(DeviceInd))
+                            print("closedevice:", ret)
 
 
 
@@ -361,17 +368,18 @@ class Configuraion():
 
 
 # 定义报文实例对象，用于发送
-vco = CAN_OBJ()
-# vco.ID = 0x00000055  # 帧的ID 默认demo
-vco.ID = 0x000003C0   # 帧的ID KL15,KLS 
-# vco.ID = 0x000005F0   # 帧的ID 大灯 
-vco.SendType = 1  # 发送帧类型，0是正常发送，1为单次发送，这里要选1！要不发不去！
-vco.RemoteFlag = 0
-vco.ExternFlag = 0
-vco.DataLen = 8
-print('***********************')
-print(type(vco.ID))
-print('***********************')
+# vco = CAN_OBJ()
+# # vco.ID = 0x00000055  # 帧的ID 默认demo
+# vco.ID = 0x000003C0   # 帧的ID KL15,KLS 
+# # vco.ID = 0x000005F0   # 帧的ID 大灯 
+# vco.SendType = 1  # 发送帧类型，0是正常发送，1为单次发送，这里要选1！要不发不去！
+# vco.RemoteFlag = 0
+# vco.ExternFlag = 0
+# vco.DataLen = 8
+# print('***********************')
+# print(vco.ID)
+# print(type(vco.ID))
+# print('***********************')
 # 单独传参数 十六进制 →OK
 # 传参数 十六进制  转到 十进制 →OK
 #大灯关闭信号 FD 00 0A FF FF 00 00 00	
@@ -449,5 +457,31 @@ if __name__ == "__main__":
     # StartCAN(设备类型号，设备索引号，第几路CAN)
     ret3 = dll.StartCAN(int(nDeviceType1), int(DeviceInd), 0)
     print("启动状态码:", ret3)
-
+    # 定义报文实例对象，用于发送
+    # vco = CAN_OBJ()
+    # # vco.ID = 0x00000055  # 帧的ID 默认demo
+    # vco.ID = 0x000003C0   # 帧的ID KL15,KLS 
+    # # vco.ID = 0x000005F0   # 帧的ID 大灯 
+    # vco.SendType = 1  # 发送帧类型，0是正常发送，1为单次发送，这里要选1！要不发不去！
+    # vco.RemoteFlag = 0
+    # vco.ExternFlag = 0
+    # vco.DataLen = 8
+    # vco.Data = (192, 0, 67, 0)
+    # vco.Reserved = (0, 0, 0)
+    # print('***********************')
+    # print(vco.ID)
+    # print(type(vco.ID))
+    # print('***********************')
     config.Normal_one_Transmission_Mode()
+    # i = 1
+    # while i:
+    #     art = dll.Transmit(int(nDeviceType1), int(DeviceInd), 0, byref(vco), 1)  # 发送vco
+    #     # ret = dll.Receive(nDeviceType, nDeviceInd, 0, byref(vco2), 1, 0)  # 以vco2的形式接收报文
+    #     time.sleep(1)  # 设置一个循环发送的时间
+    #     # if ret > 0:
+    #     #     print(i)
+    #     #     print(list(vco2.Data))  # 打印接收到的报文
+    #     i += 1
+
+    # ret = dll.CloseDevice(int(nDeviceType1), int(DeviceInd))
+    # print("closedevice:", ret)
