@@ -1,9 +1,6 @@
-import binascii
 from ctypes import *
 # from posix import PRIO_PGRP
 import time,ctypes,os,sys,json
-from binascii import a2b_hex
-import codecs
 import setting
 '''
 通过灯来判断状态00:58 power can1 can2    
@@ -11,16 +8,8 @@ DLL库 基于vb.net 开发
 config.json 配置参数
 函数库调用流程
 openDecice 打开设备 → InitCan 初始化某一路CAN → StartCAN 启动某一路CAN → Transmit (发送CAN帧) → Close Device 关闭设备
-                                                                      Receive （读取CAN帧）
+                                                                       Receive (读取CAN帧)
 '''
-# nDeviceType = 3 # 设备类型USBCAN-2E-U 单通道3 双通道4
-# nDeviceInd = 0  # 索引号0，代表设备个数
-# nReserved = 0  # 无意义参数
-# # nCANInd = 1  # can通道号
-
-# class jsons:
-#     jsonname = "config.json"
-#     jsonPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),jsonname).replace("\\",'/')
 
 # dll库类
 class keydll:
@@ -93,28 +82,6 @@ class VcoV():
 
 
 class Configuraion():
-
-    
-    # 读取setting.py文件中的cantype
-    def readConfig_cantype(self):
-        setCantype = setting.cantype()
-        self.nDeviceType1 = setCantype.nDeviceType1
-        self.AccCode = setCantype.AccCode
-        self.AccMask = setCantype.AccMask
-        self.nReserved = setCantype.nReserved
-        self.Fitter = setCantype.Filter
-        self.nDeviceInd = setCantype.nDeviceInd
-        self.baud_rate = setCantype.baud_rate
-        self.Mode = setCantype.Mode
-
-        return self.nDeviceType1,self.AccCode,self.AccMask,self.nReserved,self.Fitter,self.nDeviceInd,self.baud_rate,self.Mode
-
-    # 接口卡设备类型定义类
-    # class CanBoardTypeDefines:
-        VCI_USBCAN1 = 3     # 设备类型号3 目只连接CAN1
-        VCI_USBCAN2 = 4     # 设备类型号4
-        group1 = [VCI_USBCAN1, VCI_USBCAN2]
-
     # 波特率可以定义类
     class CanBoardTypeDefines:
         def group1_baud_rate3(self,baud_rate: int):
@@ -139,6 +106,20 @@ class Configuraion():
                     raise Exception("group1 CAN卡所设置的波特率暂不被支持 波特率为"+ str(baud_rate))
             except Exception as e:
                 raise e
+    # 读取setting.py文件中的cantype
+    def readConfig_cantype(self):
+        setCantype = setting.cantype()
+        self.nDeviceType1 = setCantype.nDeviceType1
+        self.AccCode = setCantype.AccCode
+        self.AccMask = setCantype.AccMask
+        self.nReserved = setCantype.nReserved
+        self.Fitter = setCantype.Filter
+        self.nDeviceInd = setCantype.nDeviceInd
+        self.baud_rate = setCantype.baud_rate
+        self.Mode = setCantype.Mode
+
+        return self.nDeviceType1,self.AccCode,self.AccMask,self.nReserved,self.Fitter,self.nDeviceInd,self.baud_rate,self.Mode
+
     # 定义一个用于初始化的实例对象vic
     def InitVic(self):
         self.vic = INIT_CONFIG()
@@ -212,19 +193,48 @@ class Configuraion():
 
         except Exception as e:
             raise e
+    # 关闭发送帧
+    def Close(self):
+        dll.CloseDevice(self.nDeviceType1,self.nDeviceInd)
 
 
 
 
 
-'''设备的打开如果是双通道的设备的话，可以再用initcan函数初始化'''
-    # def Normal_Transmission_Mode(self):
-    #     self.vco = CAN_OBJ()
+
+if __name__ == "__main__":
+
+
+    config = Configuraion()
+    nDeviceType1,AccCode,AccMask,Reserved,Fitter,DeviceInd,baud_rate,Mode = config.readConfig_cantype()
+    # 步骤一 打开设备 OpenDevice(设备类型号，设备索引号，参数无意义)
+    print("下面执行操作返回“1”表示操作成功！")
+    ret1 = dll.OpenDevice(int(nDeviceType1), int(DeviceInd), int(Reserved))
+    print("打开设备状态码:", ret1)
+    # 步骤二 执行参数初始化 InitCAN(设备类型号，设备索引号，第几路CAN，初始化参数initConfig)，
+    vic = config.InitVic()
+    ret2 = dll.InitCAN(int(nDeviceType1),int(DeviceInd), 0, byref(vic))
+    print("初始化状态码:", ret2)
+    # 步骤三 打开对应CAN通道 StartCAN(设备类型号，设备索引号，第几路CAN)
+    ret3 = dll.StartCAN(int(nDeviceType1), int(DeviceInd), 0)
+    print("启动状态码:", ret3)
+    # 定义报文实例对象，用于发送
+
+    config.Normal_one_Transmission_Mode()
 
 
 
 
 
+
+
+
+
+
+
+
+
+    '''设备的打开如果是双通道的设备的话，可以再用initcan函数初始化'''
 # DLL通讯
 # class Communication():
 #     baud_rate_define = CanBaudrateDefines()
@@ -258,10 +268,7 @@ class Configuraion():
 # vco.RemoteFlag = 0
 # vco.ExternFlag = 0
 # vco.DataLen = 8
-# print('***********************')
-# print(vco.ID)
-# print(type(vco.ID))
-# print('***********************')
+
 # 单独传参数 十六进制 →OK
 # 传参数 十六进制  转到 十进制 →OK
 #大灯关闭信号 FD 00 0A FF FF 00 00 00	
@@ -303,46 +310,3 @@ class Configuraion():
 # StartCAN(设备类型号，设备索引号，第几路CAN)
 # ret = dll.StartCAN(nDeviceType, nDeviceInd, 0)
 # print("startcan0:", ret)
-
-
-# i = 1
-# while i:
-#     art = dll.Transmit(nDeviceType, nDeviceInd, 0, byref(vco), 1)  # 发送vco
-#     ret = dll.Receive(nDeviceType, nDeviceInd, 0, byref(vco2), 1, 0)  # 以vco2的形式接收报文
-#     time.sleep(1)  # 设置一个循环发送的时间
-#     if ret > 0:
-#         print(i)
-#         print(list(vco2.Data))  # 打印接收到的报文
-#     i += 1
-
-# ret = dll.CloseDevice(nDeviceType, nDeviceInd)
-# print("closedevice:", ret)
-# def Data_input(data):
-#     ubyte_array = (c_byte*8)()
-#     for i in range(len(data)):
-#         ubyte_array[i] = data[i]
-#     return ubyte_array
-
-if __name__ == "__main__":
-
-
-    config = Configuraion()
-    nDeviceType1,AccCode,AccMask,Reserved,Fitter,DeviceInd,baud_rate,Mode = config.readConfig_cantype()
-    # 步骤一 打开设备
-    # OpenDevice(设备类型号，设备索引号，参数无意义)
-    print("下面执行操作返回“1”表示操作成功！")
-    ret1 = dll.OpenDevice(int(nDeviceType1), int(DeviceInd), int(Reserved))
-    print("打开设备状态码:", ret1)
-    # 步骤二 执行参数初始化
-    # InitCAN(设备类型号，设备索引号，第几路CAN，初始化参数initConfig)，
-    vic = config.InitVic()
-    ret2 = dll.InitCAN(int(nDeviceType1),int(DeviceInd), 0, byref(vic))
-
-    print("初始化状态码:", ret2)
-    # 步骤三 打开对应CAN通道
-    # StartCAN(设备类型号，设备索引号，第几路CAN)
-    ret3 = dll.StartCAN(int(nDeviceType1), int(DeviceInd), 0)
-    print("启动状态码:", ret3)
-    # 定义报文实例对象，用于发送
-
-    config.Normal_one_Transmission_Mode()
