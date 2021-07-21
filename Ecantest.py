@@ -1,8 +1,10 @@
 import binascii
 from ctypes import *
+# from posix import PRIO_PGRP
 import time,ctypes,os,sys,json
 from binascii import a2b_hex
-
+import codecs
+import setting
 '''
 通过灯来判断状态00:58 power can1 can2    
 DLL库 基于vb.net 开发
@@ -16,9 +18,9 @@ openDecice 打开设备 → InitCan 初始化某一路CAN → StartCAN 启动某
 # nReserved = 0  # 无意义参数
 # # nCANInd = 1  # can通道号
 
-class jsons:
-    jsonname = "config.json"
-    jsonPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),jsonname).replace("\\",'/')
+# class jsons:
+#     jsonname = "config.json"
+#     jsonPath = os.path.join(os.path.abspath(os.path.dirname(__file__)),jsonname).replace("\\",'/')
 
 # dll库类
 class keydll:
@@ -76,102 +78,35 @@ class CAN_OBJ_SEND(Structure):
 
 class VcoV():
     def __init__(self,ID,SendType,RemoteFlag,ExternFlag,DataLen,Data,Reserved,executivemode):
-        self.ID = int(ID,16)
-        self.SendType = int(SendType)
-        self.RemoteFlag = int(RemoteFlag)
-        self.ExternFlag = int(ExternFlag)
-        self.DataLen = int(DataLen)
-        self.Data = tuple(eval(Data))
-        self.Reserved = tuple(eval(Reserved))
-        self.executivemode = executivemode
-        # print(type(self.ID))
-        # print(type(self.SendType)
 
-    # def Vco_CAN_OBJ(self):
-    #     self.vco = CAN_OBJ()
-        # self.vco.ID = int(self.ID,16)
-        # self.vco.SendType = int(self.SendType)
-        # self.vco.RemoteFlag = int(self.RemoteFlag)
-        # self.vco.ExternFlag = int(self.ExternFlag)
-        # self.vco.DataLen = int(self.DataLen)
-        # self.vco.Data = tuple(eval(self.Data))
-        # self.vco.Reserved = tuple(eval(self.Reserved))
-        
-        # print('vco.ID:',self.vco.ID)
-        # print('vco.SendType:',self.vco.SendType)
-        # print('vco.RemoteFlag:',self.vco.RemoteFlag)
-        # print('vco.ExternFlag:',self.vco.ExternFlag)
-        # print('vco.DataLen:',self.vco.DataLen)
-        # print('vco.Data:',self.vco.Data)
-        # print('vco.Reserved:',self.vco.Reserved)
-        # print('*******************************************')
-        # print('vco.ID:',int(self.ID,16))
-        # print('vco.SendType:',int(self.SendType))
-        # print('vco.RemoteFlag:',int(self.RemoteFlag))
-        # print('vco.ExternFlag:',int(self.ExternFlag))
-        # print('vco.DataLen:',int(self.DataLen))
-        # print('vco.Data:',tuple(eval(self.Data)))
-        # print('vco.Reserved:',tuple(eval(self.Reserved)))
+        self.ID = ID
+        self.SendType = SendType
+        self.RemoteFlag = RemoteFlag
+        self.ExternFlag = ExternFlag
+        self.DataLen = DataLen
+        self.Data = Data
+        self.Reserved = Reserved
+        self.executivemode = executivemode
     def go_1(self):
         return self.ID,self.SendType,self.RemoteFlag,self.ExternFlag,self.DataLen, \
             self.Data,self.Reserved,self.executivemode
-# config.josn 配置类
+
+
 class Configuraion():
-    # class Supported ():
-        # Type_USB_CAN_2EU = "usb_can_2eu"
-        # Type_USB_CAN_II = "usb_can_ii"
 
-        # Channel_CH0 = 0
-        # Channel_CH1 = 1
-        # Channel_CH2 = 2
-        # Channel_CH3 = 3
-        # Channel_CH4 = 4
-        # Channel_CH5 = 5
-        # Channel_CH6 = 6
-
-        # Baudrate_100k = 100
-        # Baudrate_250k = 250
-        # Baudrate_500k = 500
-        # Baudrate_1000k = 1000
-
-        # Index_0 = 0
-        # Index_1 = 1
-
-    # def __init__(self):
-        # self.can_type = "USBCAN-2E-U"
-        # self.chn = 0   # can卡通道
-        # self.can_idx = 0 # CAN 卡 index
-        # self.baud_rate=500 # 波特率
-
-    # def setCan(self,can_type =Supported.Type_USB_CAN_2EU,  \
-        #        chn = Supported.Channel_CH0,can_idx = Supported.Index_0, baud_rate = Supported.Baudrate_500k):
-        # self.can_type = can_type
-        # self.chn = chn
-        # self.can_idx = can_idx
-        # self.baud_rate = baud_rate
-    # def saveConfig(self):
-        # file_name = "config.json"
-        # try:
-        #     with open(file_name,"w") as f:
-        #         json.dump(self.__dict__,f)
-        # except Exception as e:
-        #     print(e)
-        #     pass
     
-    # 读取config.json文件中的cantyoe
+    # 读取setting.py文件中的cantype
     def readConfig_cantype(self):
-        with open(jsons.jsonPath,'r',encoding='utf-8') as f:
-            self.__dict__=json.load(f)
+        setCantype = setting.cantype()
+        self.nDeviceType1 = setCantype.nDeviceType1
+        self.AccCode = setCantype.AccCode
+        self.AccMask = setCantype.AccMask
+        self.nReserved = setCantype.nReserved
+        self.Fitter = setCantype.Filter
+        self.nDeviceInd = setCantype.nDeviceInd
+        self.baud_rate = setCantype.baud_rate
+        self.Mode = setCantype.Mode
 
-            self.nDeviceType1 = self.__dict__['cantype']['nDeviceType1']
-            self.AccCode = self.__dict__['cantype']['AccCode']
-            self.AccMask = self.__dict__['cantype']['AccMask']
-            self.nReserved = self.__dict__['cantype']['nReserved']
-            self.Fitter = self.__dict__['cantype']['Filter']
-            self.nDeviceInd = self.__dict__['cantype']['nDeviceInd']
-            self.baud_rate = self.__dict__['cantype']['baud_rate']
-            self.Mode = self.__dict__['cantype']['Mode']
-            # print(self.baud_rate)
         return self.nDeviceType1,self.AccCode,self.AccMask,self.nReserved,self.Fitter,self.nDeviceInd,self.baud_rate,self.Mode
 
     # 接口卡设备类型定义类
@@ -207,133 +142,80 @@ class Configuraion():
     # 定义一个用于初始化的实例对象vic
     def InitVic(self):
         self.vic = INIT_CONFIG()
-
         config = Configuraion()
-        nDeviceType1,self.AccCode,self.AccMask,self.nReserved,self.Fitter,nDeviceInd,self.baud_rate,self.Mode = config.readConfig_cantype()
 
+        self.nDeviceType1,self.AccCode,self.AccMask,self.nReserved,self.Fitter,nDeviceInd,self.baud_rate,self.Mode = config.readConfig_cantype()
         baud_rateS = Configuraion.CanBoardTypeDefines()
         self.vic.Timing0,self.vic.Timing1 = baud_rateS.group1_baud_rate3(int(self.baud_rate))
 
         return self.vic
 
-
-
-
-
     # 读取config.json文件中的实现单次发送
     def Normal_one_Transmission_Mode(self):
-        with open(jsons.jsonPath,"r",encoding='utf-8') as f:
-            self.__dict__=json.load(f)
-            self.n1 = self.__dict__['cantype']['nDeviceType1']
-            self.nd = self.__dict__['cantype']['nDeviceInd']
-            # 单次模式判断sendMode =1 
-            self.SendMode = self.__dict__['cantype']['SendMode']
-            try:
-                if int(self.SendMode) == 0:
-                    # # 发送帧类型，1为单次发送
-                    self.SendType= self.__dict__['1普通单次发送模式']['SendType']
-                    self.SetCANlist = self.__dict__['1普通单次发送模式']['SetCANlist']
+        setMode = setting.generalCirculatioMode()
+        setcanlist = setting.canlist()
+        sMode = setMode.SendType
+        # 单次模式判断sendMode =1 
+        exmode = ''
+        try:
+            if sMode == 0:
+                # # 发送帧类型，1为单次发送
+                # self.SendType = sMode.SendType
+                # self.SetCANlist = sMode.SetCANlist
 
-                    self.vco = CAN_OBJ()
-                    self.vco.SendType = int(self.SendType)
-                    tmp = self.SetCANlist.values()
 
-                    if set(tmp) < set((self.__dict__['Can信号模拟设备list']).keys()):
-                        numlist = len(tmp)
-                        
-                        for vcoi in tmp:
-                            vcokey = self.__dict__["Can信号模拟设备list"][vcoi]
-                            # print(type(bytes(vcokey['ID'], encoding = "utf8")))
-                            # print(bytes(vcokey['ID'], encoding = "utf8"))
-                            # str16 = binascii.b2a_hex(vcokey['ID'].encode('utf-8'))
-                            # print(str16)
-                            self.vco = CAN_OBJ()
-                            vcox = VcoV(vcokey['ID'], \
-                                vcokey['SendType'],vcokey['RemoteFlag'],vcokey['ExternFlag'], \
-                               vcokey['DataLen'],vcokey['Data'],vcokey['Reserved'],vcokey['executivemode'])
-                            # v01 = vcox.Vco_CAN_OBJ()
-                            TenID,self.vco.SendType,self.vco.RemoteFlag,self.vco.ExternFlag,self.vco.DataLen,self.vco.Data,self.vco.Reserved,exmode = vcox.go_1()
-                            # print('**************************')
-                            # print(type(TenID))
-                            # print('**************************')
-                            # a = hex(TenID)
-                            # print(a)
-                            # b = a[:2] + '00000' + a[2:]
-                            # print(b)
-                            # self.vco.ID = eval(b)
-                            self.vco.ID = hex(TenID)
+                # tmp = self.SetCANlist.values()
+                vcoKey = setcanlist.KL15ONandKLSON
+                print(vcoKey)
+                vco = CAN_OBJ()
+                vco.ID = vcoKey['ID']
+                vco.SendType = vcoKey['SendType']
+                vco.RemoteFlag = vcoKey['RemoteFlag']
+                vco.ExternFlag = vcoKey['ExternFlag']
+                vco.DataLen =  vcoKey['DataLen']
+                vco.Data = vcoKey['Data']
+                vco.Reserved = vcoKey['Reserved']
+                exmode = vcoKey['executivemode']
+                # vco.ID,vco.SendType,vco.RemoteFlag,vco.ExternFlag,vco.DataLen,vco.Data,vco.Reserved,exmode = vcox.go_1()
 
-                            # print(type(self.vco.ID))
-                            # print(int(self.vco.ID))
-                            # print('--------------------------')
-                            # print('vco.ID:',self.vco.ID)
-                            # print('--------------------------')
-                            print('vco.SendType:',self.vco.SendType)
-                            print('vco.RemoteFlag:',self.vco.RemoteFlag)
-                            print('vco.ExternFlag:',self.vco.ExternFlag)
-                            print('vco.DataLen:',self.vco.DataLen)
-                            print('vco.Data:',self.vco.Data)
-                            print('vco.Reserved:',self.vco.Reserved)
 
-                            # self.vco.ID = 0x000003C0   # 帧的ID KL15,KLS 
-                            # self.vco.SendType = 1  # 发送帧类型，0是正常发送，1为单次发送，这里要选1！要不发不去！
-                            # self.vco.RemoteFlag = 0
-                            # self.vco.ExternFlag = 0
-                            # self.vco.DataLen = 8
-                            # self.vco.Data = (192, 0, 67, 0)
-                            # self.vco.Reserved = (0, 0, 0)
+                i = 1
+                while i:
+                    art = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco), 1)  # 发送vco
+                    # ret = dll.Receive(nDeviceType, nDeviceInd, 0, byref(vco2), 1, 0)  # 以vco2的形式接收报文
+                    time.sleep(1)  # 设置一个循环发送的时间
+                    # if ret > 0:
+                    #     print(i)
+                    #     print(list(vco2.Data))  # 打印接收到的报文
+                    i += 1
 
-                            i = 1
-                            while i:
-                                art = dll.Transmit(self.n1, self.nd, 0, byref(self.vco), 1)  # 发送vco
-                                # ret = dll.Receive(nDeviceType, nDeviceInd, 0, byref(vco2), 1, 0)  # 以vco2的形式接收报文
-                                time.sleep(1)  # 设置一个循环发送的时间
-                                # if ret > 0:
-                                #     print(i)
-                                #     print(list(vco2.Data))  # 打印接收到的报文
-                                i += 1
-
-                            ret = dll.CloseDevice(self.n1,self.nd)
-                                # ret = dll.CloseDevice(int(nDeviceType1), int(DeviceInd))
-                            print("closedevice:", ret)
+                ret = dll.CloseDevice(self.nDeviceType1,self.nDeviceInd)
+                    # ret = dll.CloseDevice(int(nDeviceType1), int(DeviceInd))
+                print("closedevice:", ret)
 
 
 
-                    else:
-                        print("SetCANlist中的can信号不在Can信号模拟设备list当中！")
+            else:
+                print("SetCANlist中的can信号不在Can信号模拟设备list当中！")
 
-                    return self.SendType,self.SetCANlist
+                pass
+
+
+            # elif sMode.SendType == 2:
+            #     print("ERROR =2普通循环模式")
+            #     # return timing0,timing1
+            # elif sMode.SendType == 3:
+            #     print("ERROR =3指定时间发送模式")
+            #     # return timing0,timing1
+            # else:
+            #     raise Exception("发送模式为"+ str(sMode.SendType))
+
+        except Exception as e:
+            raise e
 
 
 
 
-                elif int(self.SendMode) == 2:
-                    print("ERROR =2普通循环模式")
-                    # return timing0,timing1
-                elif int(self.SendMode) == 3:
-                    print("ERROR =3指定时间发送模式")
-                    # return timing0,timing1
-                else:
-                    raise Exception("发送模式为"+ str(self.SendMode))
-
-            except Exception as e:
-                raise e
-
-
-
-
-# i = 1
-# while i:
-#     art = dll.Transmit(nDeviceType, nDeviceInd, 0, byref(vco), 1)  # 发送vco
-#     ret = dll.Receive(nDeviceType, nDeviceInd, 0, byref(vco2), 1, 0)  # 以vco2的形式接收报文
-#     time.sleep(1)  # 设置一个循环发送的时间
-#     if ret > 0:
-#         print(i)
-#         print(list(vco2.Data))  # 打印接收到的报文
-#     i += 1
-
-# ret = dll.CloseDevice(nDeviceType, nDeviceInd)
-# print("closedevice:", ret)
 
 '''设备的打开如果是双通道的设备的话，可以再用initcan函数初始化'''
     # def Normal_Transmission_Mode(self):
@@ -435,7 +317,11 @@ class Configuraion():
 
 # ret = dll.CloseDevice(nDeviceType, nDeviceInd)
 # print("closedevice:", ret)
-
+# def Data_input(data):
+#     ubyte_array = (c_byte*8)()
+#     for i in range(len(data)):
+#         ubyte_array[i] = data[i]
+#     return ubyte_array
 
 if __name__ == "__main__":
 
@@ -458,30 +344,5 @@ if __name__ == "__main__":
     ret3 = dll.StartCAN(int(nDeviceType1), int(DeviceInd), 0)
     print("启动状态码:", ret3)
     # 定义报文实例对象，用于发送
-    # vco = CAN_OBJ()
-    # # vco.ID = 0x00000055  # 帧的ID 默认demo
-    # vco.ID = 0x000003C0   # 帧的ID KL15,KLS 
-    # # vco.ID = 0x000005F0   # 帧的ID 大灯 
-    # vco.SendType = 1  # 发送帧类型，0是正常发送，1为单次发送，这里要选1！要不发不去！
-    # vco.RemoteFlag = 0
-    # vco.ExternFlag = 0
-    # vco.DataLen = 8
-    # vco.Data = (192, 0, 67, 0)
-    # vco.Reserved = (0, 0, 0)
-    # print('***********************')
-    # print(vco.ID)
-    # print(type(vco.ID))
-    # print('***********************')
-    config.Normal_one_Transmission_Mode()
-    # i = 1
-    # while i:
-    #     art = dll.Transmit(int(nDeviceType1), int(DeviceInd), 0, byref(vco), 1)  # 发送vco
-    #     # ret = dll.Receive(nDeviceType, nDeviceInd, 0, byref(vco2), 1, 0)  # 以vco2的形式接收报文
-    #     time.sleep(1)  # 设置一个循环发送的时间
-    #     # if ret > 0:
-    #     #     print(i)
-    #     #     print(list(vco2.Data))  # 打印接收到的报文
-    #     i += 1
 
-    # ret = dll.CloseDevice(int(nDeviceType1), int(DeviceInd))
-    # print("closedevice:", ret)
+    config.Normal_one_Transmission_Mode()
