@@ -1,3 +1,4 @@
+from _typeshed import Self
 from ctypes import *
 # from posix import PRIO_PGRP
 import time,ctypes,os,sys,json
@@ -20,7 +21,7 @@ class keydll:
 dll = ctypes.windll.LoadLibrary(keydll.dllPath)  
 
 # 1.3.5 INIT_CONFIG定义一个python的'结构体'，使用ctypes继承Structure，内容是初始化需要的参数，依据产品手册
-class INIT_CONFIG(Structure):
+class VCI_INIT_CONFIG(Structure):
     _fields_ = [("AccCode", c_ulong),  # 验收码，后面是数据类型
                 ("AccMask", c_ulong),  # 屏蔽码
                 ("Reserved", c_ulong),  # 保留
@@ -32,7 +33,7 @@ class INIT_CONFIG(Structure):
                 ]  
 
 # 1.3.2 定义发送报文的结构体 CAN_OBJ 结构体表示帧的数据结构。在发送函数Transmit和接收函数Receive中被用来传送CAN信息帧。
-class CAN_OBJ(Structure):
+class VCI_CAN_OBJ(Structure):
     _fields_ = [("ID", c_uint),  # 报文帧ID'''
                 ("TimeStamp", c_uint),  # 接收到信息帧时的时间标识
                 ("TimeFlag", c_ubyte),  # 是否使用时间标识， 为1时TimeStamp有效
@@ -53,7 +54,7 @@ class CAN_OBJ(Structure):
                 ] 
 
 # 基于1.3.2 父类自创子类 定义发送报文的结构体 CAN_OBJ_SEND
-class CAN_OBJ_SEND(Structure):
+class VCI_CAN_OBJ_SEND(Structure):
     _fields_ = [("ID", c_uint),
                 ("TimeStamp", c_uint),
                 ("TimeFlag", c_byte),
@@ -64,29 +65,56 @@ class CAN_OBJ_SEND(Structure):
                 ("Data",  c_ubyte*8),
                 ("Reserved", c_ubyte*3)
                 ]
+# Can板类型定义
+class CanBoardTypeDefines:
+    VCI_USBCAN1 = 3
+    VCI_USBCAN2 = 4
 
-class VcoV():
-    def __init__(self,ID,SendType,RemoteFlag,ExternFlag,DataLen,Data,Reserved,executivemode):
-
-        self.ID = ID
-        self.SendType = SendType
-        self.RemoteFlag = RemoteFlag
-        self.ExternFlag = ExternFlag
-        self.DataLen = DataLen
-        self.Data = Data
-        self.Reserved = Reserved
-        self.executivemode = executivemode
-    def go_1(self):
-        return self.ID,self.SendType,self.RemoteFlag,self.ExternFlag,self.DataLen, \
-            self.Data,self.Reserved,self.executivemode
-
-
-class Configuraion():
-    # 波特率可以定义类
-    class CanBoardTypeDefines:
-        def group1_baud_rate3(self,baud_rate: int):
+# 波特率可以定义
+class CanBaudrateDefines:
+    def get_baud_rate_group_3(self, baud_rate: int):
             try:
-                if baud_rate == 500:
+                if baud_rate == 10:
+                    timing0 = 0x31
+                    timing1 = 0x1c
+                    return timing0,timing1
+                elif baud_rate == 20:
+                    timing0 = 0x18
+                    timing1 = 0x1c
+                    return timing0,timing1
+                elif baud_rate == 40:
+                    timing0 = 0x87
+                    timing1 = 0xff
+                    return timing0,timing1
+                elif baud_rate == 50:
+                    timing0 = 0x09
+                    timing1 = 0x1c
+                    return timing0,timing1
+                elif baud_rate == 80:
+                    timing0 = 0x83
+                    timing1 = 0xff
+                    return timing0,timing1
+                elif baud_rate == 100:
+                    timing0 = 0x04
+                    timing1 = 0x1c
+                    return timing0,timing1
+                elif baud_rate == 125:
+                    timing0 = 0x03
+                    timing1 = 0x1c
+                    return timing0,timing1
+                elif baud_rate == 200:
+                    timing0 = 0x81
+                    timing1 = 0xfa
+                    return timing0,timing1
+                elif baud_rate == 250:
+                    timing0 = 0x01
+                    timing1 = 0x1c
+                    return timing0,timing1
+                elif baud_rate == 400:
+                    timing0 = 0x80
+                    timing1 = 0xfa
+                    return timing0,timing1
+                elif baud_rate == 500:
                     timing0 = 0x00
                     timing1 = 0x1c
                     return timing0,timing1
@@ -103,9 +131,77 @@ class Configuraion():
                     timing1 = 0x14
                     return timing0,timing1
                 else:
-                    raise Exception("group1 CAN卡所设置的波特率暂不被支持 波特率为"+ str(baud_rate))
+                    raise Exception("group3 group1 CAN卡所设置的波特率暂不被支持 波特率为"+ str(baud_rate))
             except Exception as e:
                 raise e
+    
+
+class VcoV():
+    def __init__(self,ID,SendType,RemoteFlag,ExternFlag,DataLen,Data,Reserved,executivemode):
+
+        self.ID = ID
+        self.SendType = SendType
+        self.RemoteFlag = RemoteFlag
+        self.ExternFlag = ExternFlag
+        self.DataLen = DataLen
+        self.Data = Data
+        self.Reserved = Reserved
+        self.executivemode = executivemode
+    def go_1(self):
+        return self.ID,self.SendType,self.RemoteFlag,self.ExternFlag,self.DataLen, \
+            self.Data,self.Reserved,self.executivemode
+
+class Communication():
+    baud_rate_define = CanBoardTypeDefines()
+    initconfig = VCI_INIT_CONFIG(0x00000000,0xffffffff, 0, 1, 0x00, 0x1c, 0)
+    CanInfor = VCI_CAN_OBJ()
+    setCantype = setting.cantype()
+
+    def __init__(self,can_type=3,chn=0,ind=0,nd=0,Fr=0,AC=0x00000000,AM=0xffffffff,md = 0):
+        super().__init__()
+        self.CanType = can_type    #接口卡的类型USBCAN-I-3,nDeviceType1 = 3 
+        self.nDeserved = nd        #*保留参数
+        self.nDeviceInd = ind      #*索引号默认0代表设备个数
+        self.Filter = Fr           #*滤波使能0=不使能，1=使能。使能时，请参照SJA1000验收滤波器设置验收码和屏蔽码
+        self.AccCode = AC          #*验收码":"SJA1000的帧率验收码 全部是0即可 0x00000000"
+        self.AccMask = AM          #*屏蔽码":"SJA1000的帧过滤屏蔽码。屏蔽码推荐设置为0xFFFF FFFF，即全部接收
+        self.config1,self.config2 = baud_rate_define.get_baud_rate_group_3()   #*波特率解析time1和time2
+        self.Mode = md             #*模式=0为正常模式，=1为只听模式， =2为自发自收模式
+        self.run_flag = False      #用于控制运行线程
+
+    def _error_msg(self,msg:str):
+        return msg
+
+    def set_can_board_configuraion(self,can_type:str,can_idx:int,chn:int,baud_rate:int):
+        try:
+            
+
+class Configuraion():
+
+    # 波特率可以定义类
+    # class CanBoardTypeDefines:
+    #     def group1_baud_rate3(self,baud_rate: int):
+    #         try:
+    #             if baud_rate == 500:
+    #                 timing0 = 0x00
+    #                 timing1 = 0x1c
+    #                 return timing0,timing1
+    #             elif baud_rate == 666:
+    #                 timing0 = 0x80
+    #                 timing1 = 0xb6
+    #                 return timing0,timing1
+    #             elif baud_rate == 800:
+    #                 timing0 = 0x00
+    #                 timing1 = 0x16
+    #                 return timing0,timing1
+    #             elif baud_rate == 1000:
+    #                 timing0 = 0x00
+    #                 timing1 = 0x14
+    #                 return timing0,timing1
+    #             else:
+    #                 raise Exception("group1 CAN卡所设置的波特率暂不被支持 波特率为"+ str(baud_rate))
+    #         except Exception as e:
+    #             raise e
     # 读取setting.py文件中的cantype
     def readConfig_cantype(self):
         setCantype = setting.cantype()
@@ -122,7 +218,7 @@ class Configuraion():
 
     # 定义一个用于初始化的实例对象vic
     def InitVic(self):
-        self.vic = INIT_CONFIG()
+        self.vic = VCI_INIT_CONFIG()
         config = Configuraion()
 
         self.nDeviceType1,self.AccCode,self.AccMask,self.nReserved,self.Fitter,nDeviceInd,self.baud_rate,self.Mode = config.readConfig_cantype()
@@ -148,7 +244,7 @@ class Configuraion():
                 # tmp = self.SetCANlist.values()
                 vcoKey = setcanlist.KL15ONandKLSON
                 print(vcoKey)
-                vco = CAN_OBJ()
+                vco = VCI_CAN_OBJ()
                 vco.ID = vcoKey['ID']
                 vco.SendType = vcoKey['SendType']
                 vco.RemoteFlag = vcoKey['RemoteFlag']
