@@ -174,6 +174,7 @@ class Communication():
 
     def set_can_board_configuraion(self,can_type:str,can_idx:int,chn:int,baud_rate:int):
         try:
+            pass
             
 
 class Configuraion():
