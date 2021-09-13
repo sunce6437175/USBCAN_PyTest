@@ -88,6 +88,176 @@ class canlist():
         "executivemode":"false"
     }
 
+'''
+{
+	"cantype":{
+		"USBCAN设备类型":"",
+        "can_type":"usb_can_2eu",
+		"接口卡的类型USBCAN-I-3":"",
+        "nDeviceType1":"3",
+		"接口卡的类型USBCAN-II-4":"",
+		"nDeviceType2":"4",
+		"索引号默认0代表设备个数":"",
+        "nDeviceInd":"0",
+		"保留参数":"",
+		"nReserved":"0",
+		"暂无意义参数?":"",
+		"nCANInd":"1",
+		"滤波使能":"0=不使能，1=使能。使能时，请参照SJA1000验收滤波器设置验收码和屏蔽码",
+		"Filter":"0",
+		"验收码":"SJA1000的帧率验收码 全部是0即可 0x00000000",
+		"AccCode":"0x00000000",
+		"屏蔽码":"SJA1000的帧过滤屏蔽码。屏蔽码推荐设置为0xFFFF FFFF，即全部接收",
+		"AccMask":"0xffffffff",
+		"波特率":"",
+		"baud_rate":"500",
+		"模式":"=0为正常模式，=1为只听模式， =2为自发自收模式",
+		"Mode":"0",
+		"发送方式":"=1普通单次模式，=2普通循环模式，=3指定时间发送模式,=4区间发送模式",
+		"SendMode":"0"
+			},
+	"单一can指令帧ID类型":"",
+	"onlyCAN":"3C0",
+	"混合can指令帧ID类型":"",
+	"listCAN":{
+		"CANa":"3C0",
+		"CANb":"5F0"
+			},
+	"1普通单次发送模式":{
+		"发送帧类型=1时为单次发送":"",
+		"SendType":"0",
+		"SetCANlist":{
+			"CANa":"KL15 ON and KLS ON"
+				}
+
+	},
+	"2普通循环发送模式":{
+		"发送次数":"eg:500次,1000次,无限次：LimitedTime",
+		"SendTheNumber":"1000",
+		"每次发送间隔时间-单位(ms)":"eg:50ms,100ms等",
+		"TimeBetweenTransmissions":"100",
+		"发送帧类型=0时为正常发送":"",
+		"SendType":"0",
+		"SetCANlist":{
+			"CANa":"KL15 ON and KLS ON",
+			"CANb":"Headlight Open"
+				}
+
+	},
+	"3指定时间发送模式":{
+		"指定时间段运行":"",
+		"setTimeRun":"2021/06/08/20:00",
+		"指定时间段停止":"",
+		"setTimeStop":"2021/06/08/21:00"
+	},
+	"Can信号模拟设备list":{
+		"车辆点火":"C0 00 43 00",
+		"KL15 ON and KLS ON":{
+			"ID":"0x000003C0",
+			"SendType":"0",
+			"RemoteFlag":"0",
+			"ExternFlag":"0",
+			"DataLen":"4",
+			"Data":"(192, 0, 67, 0)",
+			"Reserved":"(0, 0, 0)",
+			"executivemode":"true"
+		},
+		"车门关闭车辆熄火":"80 03 01 00",
+		"KL15 OFF and KLS ON":{
+			"ID":"0x000003C0",
+			"SendType":"0",
+			"RemoteFlag":"0",
+			"ExternFlag":"0",
+			"DataLen":"4",
+			"Data":"(128, 3, 1, 0)",
+			"Reserved":"(0, 0, 0)",
+			"executivemode":"false"
+		},
+		"车辆熄火锁车":"81 03 00 00",
+		"KL15 OFF and KLS OFF":{
+			"ID":"0x000003C0",
+			"SendType":"0",
+			"RemoteFlag":"0",
+			"ExternFlag":"0",
+			"DataLen":"4",
+			"Data":"(129, 3, 0, 0)",
+			"Reserved":"(0, 0, 0)",
+			"executivemode":"false"
+		},
+		"大灯开":"FD 8A 0A FF FF 00 00 00",
+		"Headlight Open":{
+			"ID":"0x000005F0",
+			"SendType":"0",
+			"RemoteFlag":"0",
+			"ExternFlag":"0",
+			"DataLen":"8",
+			"Data":"(253, 138, 10, 255, 255, 0, 0, 0)",
+			"Reserved":"(0, 0, 0)",
+			"executivemode":"true"
+		},
+		"大灯关":"FD 00 0A FF FF 00 00 00",
+		"Headlight Closed":{
+			"ID":"0x000005F0",
+			"SendType":"0",
+			"RemoteFlag":"0",
+			"ExternFlag":"0",
+			"DataLen":"8",
+			"Data":"(253, 0, 10, 255, 255, 0, 0, 0)",
+			"Reserved":"(0, 0, 0)",
+			"executivemode":"false"
+		}
+
+	},
+	"Output_Path 收集通道接收数据文档":"",
+	"Output_Path":"//192.168.2.22/cns3.0_sop2_ma/04.C Sample/03.非功能测试/稳定性测试/MX_AnalysisMemoryLog/output/CNS3MemoryNew.xls",
+	"测试结果自动邮件反馈list":"",
+	"mailpassCc":{
+		"lead1":"zhaotj@meixing.com",
+		"lead2":"wuj@meixing.com"
+	},
+	"错误码定义":"",
+	"ERR_CAN_List":{
+		"CAN控制器内部FIFO溢出":"",
+		"ERR_CAN_OVERFLOW":"0x00000001",
+		"CAN控制器错误报警":"",
+		"ERR_CAN_ERRALARM":"0x00000002",
+		"CAN控制器消极错误":"",
+		"ERR_CAN_PASSIVE":"0x00000004",
+		"CAN控制器仲裁丢失":"",
+		"ERR_CAN_LOSE":"0x00000008",
+		"CAN控制器总线错误":"",
+		"ERR_CAN_BUSERR":"0x00000010",
+		"CAN接收寄存器满":"",
+		"ERR_CAN_REG_FULL":"0x00000020",
+		"CAN接收寄存器溢出":"",
+		"ERR_CAN_REC_OVER":"0x00000040",
+		"CAN控制器主动错误":"",
+		"ERR_CAN_ACTIVE":"0x00000080",
+		"设备已经打开":"",
+		"ERR_DEVICEOPENED":"0x00000100",
+		"打开设备错误":"",
+		"ERR_DEVICEOPEN":"0x00000200",
+		"设备没有打开":"",
+		"ERR_DEVICENOTOPEN":"0x00000400",
+		"缓冲区溢出":"",
+		"ERR_BUFFEROVERFLOW":"0x00000800",
+		"此设备不存在":"",
+		"ERR_DEVICENOTEXIST":"0x00001000",
+		"装载动态库失败":"",
+		"ERR_LOADKERNELDLL":"0x00002000",
+		"执行命令失败错误码":"",
+		"ERR_CMDFAILED":"0x00004000",
+		"内存不足":"",
+		"ERR_BUFFERCREATE":"0x00008000"
+	}
+
+}
+'''
+
+
+
+
+
 
 '''以下是基本功能demo'''
 # DLL通讯
