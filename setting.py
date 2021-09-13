@@ -141,6 +141,12 @@ class Configuration():
             self .__dict__ = json.load(f)
 
 
+if __name__ == '__main__':
+    config = Configuration()
+    config.readConfig()
+
+    pass
+
 
 #原config设置项参数
 '''
