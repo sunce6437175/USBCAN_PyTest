@@ -1,4 +1,4 @@
-from _typeshed import Self
+# from _typeshed import Self
 from ctypes import *
 # from posix import PRIO_PGRP
 import time,ctypes,os,sys,json
@@ -179,7 +179,7 @@ class Communication():
         try:
             if type(can_type) != str or type(chn) != int or type(baud_rate) != int:
                 return False, self._error_msg(" InputType is not satisfied! At GetCANBoardConfigurtaion Function")
-            if self.can_
+            # if self.can_
         except Exception as e:
             raise e
             print(e)
@@ -301,4 +301,4 @@ if __name__ == "__main__":
     print("启动状态码:", ret3)
     # 定义报文实例对象，用于发送
 
-    config.Normal_one_Transmission_Mode()
+    # config.Normal_one_Transmission_Mode()
