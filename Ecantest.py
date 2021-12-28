@@ -172,7 +172,7 @@ class Communication():
     def _error_msg(self,msg:str):
         return msg
     def _trans_can_type(self, typename: str):
-        if typename.lower() == "usb_can_2eu":  # 姝ゅ搴斿綋鐢� re 鍘昏В鏋�
+        if typename.lower() == "usb_can_2eu":  
             return True, CanBoardTypeDefines.VCI_USBCAN_2E_U, "ok"
 
     def set_can_board_configuraion(self,can_type:str,can_idx:int,chn:int,baud_rate:int):
@@ -189,7 +189,7 @@ class Configuraion():
     # 读取setting.py文件中的cantype
     def readConfig_cantype(self):
         setCantype = setting.cantype()
-        self.nDeviceType1 = setCantype.nDeviceType1
+        self.nDeviceType1 = setCantype.nDeviceInd
         self.AccCode = setCantype.AccCode
         self.AccMask = setCantype.AccMask
         self.nReserved = setCantype.nReserved
@@ -202,14 +202,24 @@ class Configuraion():
 
     # 定义一个用于初始化的实例对象vic
     def InitVic(self):
-        self.vic = VCI_INIT_CONFIG()
+        baseVic = VCI_INIT_CONFIG()
         config = Configuraion()
-
+        
         self.nDeviceType1,self.AccCode,self.AccMask,self.nReserved,self.Fitter,nDeviceInd,self.baud_rate,self.Mode = config.readConfig_cantype()
-        baud_rateS = Configuraion.CanBoardTypeDefines()
-        self.vic.Timing0,self.vic.Timing1 = baud_rateS.group1_baud_rate3(int(self.baud_rate))
+        baseVic.AccCode = self.AccCode
+        baseVic.AccMask = self.AccMask
+        baseVic.reserved = self.nReserved
+        baseVic.Filter = self.Fitter
+        baseVic.Timing0 = 0x00 # 500Kbps
+        baseVic.Timing1 = 0x1C  # 500Kbps
+        baseVic.Mode = self.Mode
 
-        return self.vic
+
+        # 旧传数据方法
+        # baud_rateS = Configuraion.CanBoardTypeDefines()
+        # self.vic.Timing0,self.vic.Timing1 = baud_rateS.group1_baud_rate3(int(self.baud_rate))
+
+        return baseVic
 
     # 读取config.json文件中的实现单次发送
     def Normal_one_Transmission_Mode(self):
@@ -290,15 +300,18 @@ if __name__ == "__main__":
     nDeviceType1,AccCode,AccMask,Reserved,Fitter,DeviceInd,baud_rate,Mode = config.readConfig_cantype()
     # 步骤一 打开设备 OpenDevice(设备类型号，设备索引号，参数无意义)
     print("下面执行操作返回“1”表示操作成功！")
+
     ret1 = dll.OpenDevice(int(nDeviceType1), int(DeviceInd), int(Reserved))
     print("打开设备状态码:", ret1)
+
     # 步骤二 执行参数初始化 InitCAN(设备类型号，设备索引号，第几路CAN，初始化参数initConfig)，
     vic = config.InitVic()
     ret2 = dll.InitCAN(int(nDeviceType1),int(DeviceInd), 0, byref(vic))
     print("初始化状态码:", ret2)
+
     # 步骤三 打开对应CAN通道 StartCAN(设备类型号，设备索引号，第几路CAN)
     ret3 = dll.StartCAN(int(nDeviceType1), int(DeviceInd), 0)
     print("启动状态码:", ret3)
-    # 定义报文实例对象，用于发送
 
-    # config.Normal_one_Transmission_Mode()
+    # 定义报文实例对象，用于发送
+    config.Normal_one_Transmission_Mode()
