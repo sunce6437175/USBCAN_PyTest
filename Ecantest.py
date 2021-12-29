@@ -280,9 +280,9 @@ class Configuraion():
 
                 i = 1
                 while i:
-                    art1 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco1), 1)  # 发送vco
+                    art1 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco1), 1)  # 发送vco1
                     
-                    art2 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco2), 1)  # 发送vco
+                    art2 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco2), 1)  # 发送vco2
                     time.sleep(1)
                     art3 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco3), 1) 
                     # ret = dll.Receive(nDeviceType, nDeviceInd, 0, byref(vco2), 1, 0)  # 以vco2的形式接收报文
