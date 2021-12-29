@@ -20,7 +20,9 @@ class cantype():
 class generalCirculatioMode():
     SendType = 0            #发送帧类型=1时为单次发送,=0为循环发送
     SetCANlist = {
-        'CANa':'KL15ONandKLSON'
+        'CANa':'KL15ONandKLSON',
+        'CANb':'Headlightopen',
+        'CANc':'HeadlightClosed'
     }
 # 2普通循环发送模式
 class generalCirculatioModeAgain():

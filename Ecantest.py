@@ -234,26 +234,57 @@ class Configuraion():
                 # self.SendType = sMode.SendType
                 # self.SetCANlist = sMode.SetCANlist
 
-
                 # tmp = self.SetCANlist.values()
-                vcoKey = setcanlist.KL15ONandKLSON
-                print(vcoKey)
-                vco = VCI_CAN_OBJ()
-                vco.ID = vcoKey['ID']
-                vco.SendType = vcoKey['SendType']
-                vco.RemoteFlag = vcoKey['RemoteFlag']
-                vco.ExternFlag = vcoKey['ExternFlag']
-                vco.DataLen =  vcoKey['DataLen']
-                vco.Data = vcoKey['Data']
-                vco.Reserved = vcoKey['Reserved']
-                exmode = vcoKey['executivemode']
+                vcoKey1 = setcanlist.KL15ONandKLSON
+                print(vcoKey1)
+                vco1 = VCI_CAN_OBJ()
+                # vco1.TimeStamp = int(100000)   无法控制间隔时间
+                # vco1.TimeFlag = int(1)         无法控制间隔时间
+                vco1.ID = vcoKey1['ID']
+                vco1.SendType = vcoKey1['SendType']
+                vco1.RemoteFlag = vcoKey1['RemoteFlag']
+                vco1.ExternFlag = vcoKey1['ExternFlag']
+                vco1.DataLen =  vcoKey1['DataLen']
+                vco1.Data = vcoKey1['Data']
+                vco1.Reserved = vcoKey1['Reserved']
+                exmode = vcoKey1['executivemode']
                 # vco.ID,vco.SendType,vco.RemoteFlag,vco.ExternFlag,vco.DataLen,vco.Data,vco.Reserved,exmode = vcox.go_1()
 
+                vcoKey2 = setcanlist.Headlightopen
+                print(vcoKey2)
+                vco2 = VCI_CAN_OBJ()
+                # vco2.TimeStamp = int(500000)
+                # vco2.TimeFlag = int(1)
+                vco2.ID = vcoKey2['ID']
+                vco2.SendType = vcoKey2['SendType']
+                vco2.RemoteFlag = vcoKey2['RemoteFlag']
+                vco2.ExternFlag = vcoKey2['ExternFlag']
+                vco2.DataLen =  vcoKey2['DataLen']
+                vco2.Data = vcoKey2['Data']
+                vco2.Reserved = vcoKey2['Reserved']
+                exmode = vcoKey2['executivemode']
+
+                vcoKey3 = setcanlist.HeadlightClosed
+                print(vcoKey3)
+                vco3 = VCI_CAN_OBJ()
+                # vco3.TimeStamp = int(250000)
+                # vco3.TimeFlag = int(1)
+                vco3.ID = vcoKey3['ID']
+                vco3.SendType = vcoKey3['SendType']
+                vco3.RemoteFlag = vcoKey3['RemoteFlag']
+                vco3.ExternFlag = vcoKey3['ExternFlag']
+                vco3.DataLen =  vcoKey3['DataLen']
+                vco3.Data = vcoKey3['Data']
+                vco3.Reserved = vcoKey3['Reserved']
+                exmode = vcoKey3['executivemode']
 
                 i = 1
                 while i:
-                    art = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco), 1)  # 发送vco
-
+                    art1 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco1), 1)  # 发送vco
+                    
+                    art2 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco2), 1)  # 发送vco
+                    time.sleep(1)
+                    art3 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco3), 1) 
                     # ret = dll.Receive(nDeviceType, nDeviceInd, 0, byref(vco2), 1, 0)  # 以vco2的形式接收报文
                     time.sleep(1)  # 设置一个循环发送的时间
                     # if ret > 0:
@@ -295,21 +326,25 @@ class Configuraion():
 
 if __name__ == "__main__":
 
-
+    # 参数结构体封装
     config = Configuraion()
     nDeviceType1,AccCode,AccMask,Reserved,Fitter,DeviceInd,baud_rate,Mode = config.readConfig_cantype()
-    # 步骤一 打开设备 OpenDevice(设备类型号，设备索引号，参数无意义)
+    
+    # 步骤一(↓) 打开设备 OpenDevice(设备类型号，设备索引号，参数无意义)
     print("下面执行操作返回“1”表示操作成功！")
-
     ret1 = dll.OpenDevice(int(nDeviceType1), int(DeviceInd), int(Reserved))
     print("打开设备状态码:", ret1)
 
-    # 步骤二 执行参数初始化 InitCAN(设备类型号，设备索引号，第几路CAN，初始化参数initConfig)，
+
+    # 步骤二(↓) 执行参数初始化 InitCAN(DevType：设备类型号，DevIndex：设备索引号，CANIndex：第几路CAN，pInitConfig：初始化参数initConfig)，\ 
+    # pInitConfig 初始化参数结构(AccCode、AccMask、Reserved、>Filter、Timing0、Timing1、Mode ；为1表示操作成功，0表示操作失败。)
     vic = config.InitVic()
     ret2 = dll.InitCAN(int(nDeviceType1),int(DeviceInd), 0, byref(vic))
     print("初始化状态码:", ret2)
 
-    # 步骤三 打开对应CAN通道 StartCAN(设备类型号，设备索引号，第几路CAN)
+
+
+    # 步骤三(↓) 打开对应CAN通道 StartCAN(设备类型号，设备索引号，第几路CAN) 为1表示操作成功，0表示操作失败。
     ret3 = dll.StartCAN(int(nDeviceType1), int(DeviceInd), 0)
     print("启动状态码:", ret3)
 
