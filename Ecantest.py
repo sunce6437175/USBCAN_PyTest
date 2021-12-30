@@ -1,7 +1,7 @@
 # from _typeshed import Self
 from ctypes import *
 # from posix import PRIO_PGRP
-import time,ctypes,os,sys,json
+import time,ctypes,os,sys,json,threading
 import setting
 '''
 通过灯来判断状态00:58 power can1 can2    
@@ -184,7 +184,13 @@ class Communication():
             raise e
             print(e)
 
-class Configuraion():
+class Configuraion(threading.Thread):
+    def __init__(self,threadID,name,counter):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.counter = counter
+        
 
     # 读取setting.py文件中的cantype
     def readConfig_cantype(self):
@@ -203,9 +209,9 @@ class Configuraion():
     # 定义一个用于初始化的实例对象vic
     def InitVic(self):
         baseVic = VCI_INIT_CONFIG()
-        config = Configuraion()
+        # config = Configuraion()
         
-        self.nDeviceType1,self.AccCode,self.AccMask,self.nReserved,self.Fitter,nDeviceInd,self.baud_rate,self.Mode = config.readConfig_cantype()
+        # self.nDeviceType1,self.AccCode,self.AccMask,self.nReserved,self.Fitter,nDeviceInd,self.baud_rate,self.Mode = config.readConfig_cantype()
         baseVic.AccCode = self.AccCode
         baseVic.AccMask = self.AccMask
         baseVic.reserved = self.nReserved
@@ -220,6 +226,15 @@ class Configuraion():
         # self.vic.Timing0,self.vic.Timing1 = baud_rateS.group1_baud_rate3(int(self.baud_rate))
 
         return baseVic
+    # 学习线程使用函数
+    def print_time(self):
+        # exitFlag = 0
+        # while self.counter:
+        #     if exitFlag:
+        #         self.name.exit()
+            # time.sleep(self.counter)
+        print ("%s: %s" % (self.name, time.ctime(time.time())))
+            # self.counter -= 1
 
     # 读取config.json文件中的实现单次发送
     def Normal_one_Transmission_Mode(self):
@@ -250,47 +265,25 @@ class Configuraion():
                 exmode = vcoKey1['executivemode']
                 # vco.ID,vco.SendType,vco.RemoteFlag,vco.ExternFlag,vco.DataLen,vco.Data,vco.Reserved,exmode = vcox.go_1()
 
-                vcoKey2 = setcanlist.Headlightopen
-                print(vcoKey2)
-                vco2 = VCI_CAN_OBJ()
-                # vco2.TimeStamp = int(500000)
-                # vco2.TimeFlag = int(1)
-                vco2.ID = vcoKey2['ID']
-                vco2.SendType = vcoKey2['SendType']
-                vco2.RemoteFlag = vcoKey2['RemoteFlag']
-                vco2.ExternFlag = vcoKey2['ExternFlag']
-                vco2.DataLen =  vcoKey2['DataLen']
-                vco2.Data = vcoKey2['Data']
-                vco2.Reserved = vcoKey2['Reserved']
-                exmode = vcoKey2['executivemode']
-
-                vcoKey3 = setcanlist.HeadlightClosed
-                print(vcoKey3)
-                vco3 = VCI_CAN_OBJ()
-                # vco3.TimeStamp = int(250000)
-                # vco3.TimeFlag = int(1)
-                vco3.ID = vcoKey3['ID']
-                vco3.SendType = vcoKey3['SendType']
-                vco3.RemoteFlag = vcoKey3['RemoteFlag']
-                vco3.ExternFlag = vcoKey3['ExternFlag']
-                vco3.DataLen =  vcoKey3['DataLen']
-                vco3.Data = vcoKey3['Data']
-                vco3.Reserved = vcoKey3['Reserved']
-                exmode = vcoKey3['executivemode']
-
                 i = 1
                 while i:
+                    print ("开始线程：" + self.name)
                     art1 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco1), 1)  # 发送vco1
-                    
-                    art2 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco2), 1)  # 发送vco2
-                    time.sleep(1)
-                    art3 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco3), 1) 
                     # ret = dll.Receive(nDeviceType, nDeviceInd, 0, byref(vco2), 1, 0)  # 以vco2的形式接收报文
+                    self.print_time()
+                    print ("退出线程：" + self.name)
                     time.sleep(1)  # 设置一个循环发送的时间
                     # if ret > 0:
                     #     print(i)
                     #     print(list(vco2.Data))  # 打印接收到的报文
                     i += 1
+                    print(i)
+                    print(self.counter)
+                    if i == self.counter:
+                        i = 0
+                    threadLock.acquire()
+                    # 线程学习网站 https://www.runoob.com/python3/python3-multithreading.html
+                    
 
                 ret = dll.CloseDevice(self.nDeviceType1,self.nDeviceInd)
                     # ret = dll.CloseDevice(int(nDeviceType1), int(DeviceInd))
@@ -303,7 +296,6 @@ class Configuraion():
 
                 pass
 
-
             # elif sMode.SendType == 2:
             #     print("ERROR =2普通循环模式")
             #     # return timing0,timing1
@@ -315,6 +307,100 @@ class Configuraion():
 
         except Exception as e:
             raise e
+
+    def Normal_one_Transmission_Mode2(self):
+        setMode = setting.generalCirculatioMode()
+        setcanlist = setting.canlist()
+        sMode = setMode.SendType
+        # 单次模式判断sendMode =1 
+        exmode = ''
+        try:
+            if sMode == 0:
+                vcoKey2 = setcanlist.Headlightopen
+                print(vcoKey2)
+                vco2 = VCI_CAN_OBJ()
+                vco2.ID = vcoKey2['ID']
+                vco2.SendType = vcoKey2['SendType']
+                vco2.RemoteFlag = vcoKey2['RemoteFlag']
+                vco2.ExternFlag = vcoKey2['ExternFlag']
+                vco2.DataLen =  vcoKey2['DataLen']
+                vco2.Data = vcoKey2['Data']
+                vco2.Reserved = vcoKey2['Reserved']
+                exmode = vcoKey2['executivemode']
+
+                i = 1
+                while i:
+                    print ("开始线程：" + self.name)
+                    art2 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco2), 1)  # 发送vco2
+                    self.print_time()
+                    print ("退出线程：" + self.name)
+                    time.sleep(1)  # 设置一个循环发送的时间
+
+                    i += 1
+                    print(i)
+                    print(self.counter)
+                    if i == self.counter:
+                        i = 0
+
+                ret = dll.CloseDevice(self.nDeviceType1,self.nDeviceInd)
+                    # ret = dll.CloseDevice(int(nDeviceType1), int(DeviceInd))
+                print("closedevice:", ret)
+
+
+
+            else:
+                print("SetCANlist中的can信号不在Can信号模拟设备list当中！")
+
+                pass
+
+        except Exception as e:
+            raise e
+
+    def Normal_one_Transmission_Mode3(self):
+        setMode = setting.generalCirculatioMode()
+        setcanlist = setting.canlist()
+        sMode = setMode.SendType
+        # 单次模式判断sendMode =1 
+        exmode = ''
+        try:
+            if sMode == 0:
+                vcoKey3 = setcanlist.HeadlightClosed
+                print(vcoKey3)
+                vco3 = VCI_CAN_OBJ()
+                vco3.ID = vcoKey3['ID']
+                vco3.SendType = vcoKey3['SendType']
+                vco3.RemoteFlag = vcoKey3['RemoteFlag']
+                vco3.ExternFlag = vcoKey3['ExternFlag']
+                vco3.DataLen =  vcoKey3['DataLen']
+                vco3.Data = vcoKey3['Data']
+                vco3.Reserved = vcoKey3['Reserved']
+                exmode = vcoKey3['executivemode']
+
+                i = 1
+                while i:
+                    print ("开始线程：" + self.name)
+                    art3 = dll.Transmit(self.nDeviceType1,self.nDeviceInd, 0, byref(vco3), 1) 
+                    self.print_time()
+                    print ("退出线程：" + self.name)
+                    time.sleep(1)  # 设置一个循环发送的时间
+
+                    i += 1
+                    print(i)
+                    print(self.counter)
+                    if i == self.counter:
+                        i = 0
+                    threadLock.release()
+                ret = dll.CloseDevice(self.nDeviceType1,self.nDeviceInd)
+                    # ret = dll.CloseDevice(int(nDeviceType1), int(DeviceInd))
+                print("closedevice:", ret)
+            else:
+                print("SetCANlist中的can信号不在Can信号模拟设备list当中！")
+
+                pass
+
+        except Exception as e:
+            raise e
+
     # 关闭发送帧
     def Close(self):
         dll.CloseDevice(self.nDeviceType1,self.nDeviceInd)
@@ -325,11 +411,27 @@ class Configuraion():
 
 
 if __name__ == "__main__":
+    threadLock = threading.Lock()
+    threads = []
 
     # 参数结构体封装
-    config = Configuraion()
-    nDeviceType1,AccCode,AccMask,Reserved,Fitter,DeviceInd,baud_rate,Mode = config.readConfig_cantype()
+    thread1 = Configuraion(1, "Thread-1", 100)
+    thread2 = Configuraion(2, "Thread-2", 11)
+    thread3 = Configuraion(3, "Thread-3", 10)
+
+    thread1.start()
+    thread2.start()
+    thread3.start()
+    # config = Configuraion()
+    nDeviceType1,AccCode,AccMask,Reserved,Fitter,DeviceInd,baud_rate,Mode = thread1.readConfig_cantype()
+    nDeviceType1,AccCode,AccMask,Reserved,Fitter,DeviceInd,baud_rate,Mode = thread2.readConfig_cantype()
+    nDeviceType1,AccCode,AccMask,Reserved,Fitter,DeviceInd,baud_rate,Mode = thread3.readConfig_cantype()
     
+    # 添加线程到线程列表
+    threads.append(thread1)
+    threads.append(thread2)
+    threads.append(thread3)
+
     # 步骤一(↓) 打开设备 OpenDevice(设备类型号，设备索引号，参数无意义)
     print("下面执行操作返回“1”表示操作成功！")
     ret1 = dll.OpenDevice(int(nDeviceType1), int(DeviceInd), int(Reserved))
@@ -338,7 +440,7 @@ if __name__ == "__main__":
 
     # 步骤二(↓) 执行参数初始化 InitCAN(DevType：设备类型号，DevIndex：设备索引号，CANIndex：第几路CAN，pInitConfig：初始化参数initConfig)，\ 
     # pInitConfig 初始化参数结构(AccCode、AccMask、Reserved、>Filter、Timing0、Timing1、Mode ；为1表示操作成功，0表示操作失败。)
-    vic = config.InitVic()
+    vic = thread1.InitVic()
     ret2 = dll.InitCAN(int(nDeviceType1),int(DeviceInd), 0, byref(vic))
     print("初始化状态码:", ret2)
 
@@ -348,5 +450,17 @@ if __name__ == "__main__":
     ret3 = dll.StartCAN(int(nDeviceType1), int(DeviceInd), 0)
     print("启动状态码:", ret3)
 
-    # 定义报文实例对象，用于发送
-    config.Normal_one_Transmission_Mode()
+    # 定义报文实例对象，用于发送(总线程)
+    thread1.Normal_one_Transmission_Mode()
+
+        # 定义报文实例对象，用于发送(开大灯)
+    thread2.Normal_one_Transmission_Mode2()
+
+        # 定义报文实例对象，用于发送(关大灯)
+    thread3.Normal_one_Transmission_Mode3()
+
+
+    # 等待所有线程完成
+    for t in threads:
+        t.join()
+    print ("退出主线程")
